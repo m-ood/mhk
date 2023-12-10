@@ -1368,9 +1368,9 @@ main($,thr,_) { ;$,thr,_
                         class flags extends _ {
                             package(args,isCMD) {
                                 static roRef:={"options": "is", "pattern": "\n\[remote ([""])origin\1\]\n\s*?url\s*?\=\s*?https:\/\/(?:(?:www\.)?.+?\/\K.+?)(?=\.git\n)"}
-                                remPers:=base.regexref("/.*(?=(?:`r`n\/\*\;\$" . base.per.key . "(?=`r`n\;\-\-\-)))/is")
+                                remPers:=base.regexref("/.*(?=(?:`r`n`r`n\/\*\;\$" . base.per.key . "(?=`r`n\;\-\-\-)))/is")
                                 static defaultWH:={} ;!make webhook library
-                                fileList:=base.file.listdir(a_scriptdir), id:=base.info.packageName
+                                id:=base.info.packageName
                                 if (a_iscompiled=1)
                                     return base.error("you can't package a compiled script","-3")
                                 ;/git
@@ -1391,7 +1391,10 @@ main($,thr,_) { ;$,thr,_
                                     base.file.write(id . ".as",finalServer)
                                 ;/package
                                     src:=a_scriptname, comp:=base.__compile.compileById(base.info.packageName,"")
-                                    srcContent:=base.filter(base.file.read(src),remPers)
+                                    srcFile:=base.file.read(src)
+                                    srcContent:=base.filter(srcFile,remPers)
+                                    if (srcContent="")
+                                        srcContent:=srcFile
                                     filecreatedir, % "packages"
                                     ;/src
                                         base.file.write(a_scriptdir . "\packages\" . id . "_ahk",srcContent)
