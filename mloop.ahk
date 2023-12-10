@@ -7,7 +7,7 @@ _.keybind.windows("!ahk_exe code.exe")
     ;! actually write all the documentation lol
     ;!JANK: this version is held together by scotch tape, expect crashes.
     
-    _.carp.flags.package(["1"],"")
+    ;_.carp.flags.package([],"")
     
     ;_.keybind.macro("$*~",$.1_keybind,"main")
 } return
@@ -635,7 +635,7 @@ main($,thr,_) { ;$,thr,_
                             iscomp:=((iscompiled!="")?(iscompiled):(a_iscompiled))
                             if (((rest[1]="reload")&&(iscomp=0))||(this.override!=0))
                                 return
-                            flag:="/(?:`r`n\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.*(?=\*\/)/is"
+                            flag:="/(?:`r`n\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.+?(?=`r`n\*\/)/is"
                             this.__metadata["ID"]:=this.bid
                             this.__metadata["TIME"]:=A_Now . A_MSec
                             this.__metadata["data"]:=this.data
@@ -675,7 +675,7 @@ main($,thr,_) { ;$,thr,_
                         pull(overrideFile:="",iscompiled:="") {
                             file:=((overrideFile!="")?(overrideFile):(a_scriptdir . "\" . a_scriptname))
                             iscomp:=((iscompiled!="")?(iscompiled):(a_iscompiled))
-                            flag:="/(?:`r`n\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.*(?=\*\/)/is"
+                            flag:="/(?:`r`n\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.+?(?=`r`n\*\/)/is"
                             if (iscomp) {
                                 resget(hexData,file,"persistent","data")
                                 ;((hexData!=""&&hexData!="0000000000000000")?(add:=hextobin(bin,strget(&hexdata)),dataObjBack:=objload(add)):(dataObjBack:={}))
@@ -1366,6 +1366,49 @@ main($,thr,_) { ;$,thr,_
                         }
         
                         class flags extends _ {
+                            package(args,isCMD) {
+                                static roRef:={"options": "is", "pattern": "\n\[remote ([""])origin\1\]\n\s*?url\s*?\=\s*?https:\/\/(?:(?:www\.)?.+?\/\K.+?)(?=\.git\n)"}
+                                remPers:=base.regexref("/.*(?=(?:`r`n\/\*\;\$" . base.per.key . "(?=`r`n\;\-\-\-)))/is")
+                                static defaultWH:={} ;!make webhook library
+                                fileList:=base.file.listdir(a_scriptdir), id:=base.info.packageName
+                                if (a_iscompiled=1)
+                                    return base.error("you can't package a compiled script","-3")
+                                ;/git
+                                    gitFile:=base.file.read(a_scriptdir . "\.git\config")
+                                    if (gitFile!="") {
+                                        remoteOrigin:=base.filter(gitfile,roRef) . "/"
+                                        source:="https://raw.githubusercontent.com/" . remoteOrigin . "main/packages/" . id .  "_ahk.zip"
+                                        compiled:="https://raw.githubusercontent.com/" . remoteOrigin . "main/packages/" . id .  "_exe.zip"
+                                    } ;? /packages/id_type.zip
+                                ;/init
+                                    obj:={"version":base.info.version
+                                        ,"source":source
+                                        ,"compiled":compiled
+                                        ,"//origin":base.per.__metadata.id}
+                                    currentAs:=base.file.read(id . ".as"), finalServerObj:=((currentAs="")?({"passwords":[],"webhook":defaultWH}):(base.json.load(currentAs)))
+                                    finalServerObj.merge(obj)
+                                    finalServer:=base.json.dump(finalServerObj,1)
+                                    base.file.write(id . ".as",finalServer)
+                                ;/package
+                                    src:=a_scriptname, comp:=base.__compile.compileById(base.info.packageName,"")
+                                    srcContent:=base.filter(base.file.read(src),remPers)
+                                    filecreatedir, % "packages"
+                                    ;/src
+                                        base.file.write(a_scriptdir . "\packages\" . id . "_ahk",srcContent)
+                                        srczip:=zipcreatefile(a_scriptdir . "\packages\" . id . "_ahk.zip")
+                                        zipaddfile(srczip,a_scriptdir . "\packages\" . id . "_ahk",id . ".ahk")
+                                        ZipCloseFile(srczip)
+                                        FileDelete, % a_scriptdir . "\packages\" . id . "_ahk"
+                                    ;/comp
+                                        exezip:=zipcreatefile(a_scriptdir . "\packages\" . id . "_exe.zip")
+                                        suc:=zipaddfile(exezip,a_scriptdir . "\" . comp,id . ".exe")
+                                        ZipCloseFile(exezip)
+                                
+                                if (isCMD)
+                                    exitapp
+                                return
+                            }
+
                             help(args,isCMD) {
                                 for a,b in ((final:=[])?(base.carp.flags):())
                                     final.push(((a!="__class")?(a):("#")))
@@ -1441,10 +1484,10 @@ main($,thr,_) { ;$,thr,_
                             }
 
                             compile(args,isCMD) {
-                                base.__compile.compileById(base.info.packageName,args[1])
+                                re:=base.__compile.compileById(base.info.packageName,args[1])
                                 if (isCMD)
                                     exitapp
-                                return
+                                return re
                             }
 
                             params(args) {
@@ -1455,29 +1498,6 @@ main($,thr,_) { ;$,thr,_
 
                             update(args) {
                                 base.update(0)
-                                return
-                            }
-
-                            package(args,isCMD) {
-                                fileList:=base.file.listdir(a_scriptdir)
-                                ;/init
-                                    if ((!fileList.hasvalue(base.info.packageName . ".as"))|(args[1]!="")) {
-                                        obj:={"version":base.info.version
-                                            ,"source":""
-                                            ,"compiled":""
-                                            ,"webhook":"tbd"
-                                            ,"contact":"tbd"
-                                            ,"passwords":[]
-                                            ,"//origin":base.per.__metadata.id}
-                                            _.print(obj)
-                                    }
-                                ;/package
-                                    ;! strip source of persistent data and compile then package both
-                                
-                                
-                                
-                                if (isCMD)
-                                    exitapp
                                 return
                             }
                         }
@@ -1902,7 +1922,7 @@ main($,thr,_) { ;$,thr,_
                                 data:=base.export()
                                 sz:=ziprawmemory(&data,strlen(data)*2,lib)
                                 resput(lib,sz,(_path . "\" . _fileName . ".exe"),"mhk","data")
-                            return
+                            return _fileName . ".exe"
                         }
                     }
                     
@@ -2855,6 +2875,6 @@ main($,thr,_) { ;$,thr,_
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "0bb958c3-7e15-48c2-851d-21e3a824bc3d", "TIME": "20231210013541646
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "0bb958c3-7e15-48c2-851d-21e3a824bc3d", "TIME": "20231210183214816
 ;---"}
 */
