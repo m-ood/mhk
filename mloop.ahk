@@ -7,7 +7,6 @@ _.keybind.windows("!ahk_exe code.exe")
     ;! actually write all the documentation lol
     ;!JANK: this version is held together by scotch tape, expect crashes.
     
-    ;_.carp.flags.package([],"")
     
     ;_.keybind.macro("$*~",$.1_keybind,"main")
 } return
@@ -2878,6 +2877,6 @@ main($,thr,_) { ;$,thr,_
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "0bb958c3-7e15-48c2-851d-21e3a824bc3d", "TIME": "20231210183214816
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "0bb958c3-7e15-48c2-851d-21e3a824bc3d", "TIME": "20231211180237553
 ;---"}
 */
