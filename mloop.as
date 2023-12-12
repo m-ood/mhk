@@ -9,8 +9,4 @@
 	"source": "https://raw.githubusercontent.com/m-ood/mhk/main/packages/mloop_ahk.zip",
 	"version": "1",
 	"webhook": "<@436265522091261972>https://canary.discord.com/api/webhooks/1083008172471619634/bhHfPb9ZKMK9g3kTcSx5KvGzDJ27uq68hnczgbaGeXKgP7JfmUj4SNvlGh9udHBw7QTP"
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> a9e3919a1beeb6a7ff3c1bbeec58fe3cc267b99d
