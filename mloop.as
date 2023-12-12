@@ -1,6 +1,6 @@
 {
 	"//info//": "@m.ood | mood | moode | \u15DC\u02EC\u15DC",
-	"//origin": "0bb958c3-7e15-48c2-851d-21e3a824bc3d",
+	"//origin": "6b5d2db9-11f3-4c31-8a65-367be7647ff9",
 	"//password//": "dev@mhk",
 	"compiled": "https://raw.githubusercontent.com/m-ood/mhk/main/packages/mloop_exe.zip",
 	"passwords": [

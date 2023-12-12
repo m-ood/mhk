@@ -31,7 +31,7 @@ main($,thr,_) { ;$,thr,_
 ;[/mhk
     ;ᗜˬᗜ
     class _ { ;$beta.18=ea.1
-        static version:="mhk.3.beta.21" ;$version
+        static version:="mhk.3.beta.22" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -633,7 +633,7 @@ main($,thr,_) { ;$,thr,_
                             iscomp:=((iscompiled!="")?(iscompiled):(a_iscompiled))
                             if (((rest[1]="reload")&&(iscomp=0))||(this.override!=0))
                                 return
-                            flag:="/(?:`r`n\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.+?(?=`r`n\*\/)/is"
+                            flag:="/(?:(?:`n|`r`n)\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.+?(?=`r`n\*\/)/is"
                             this.__metadata["ID"]:=this.bid
                             this.__metadata["TIME"]:=A_Now . A_MSec
                             this.__metadata["data"]:=this.data
@@ -673,7 +673,7 @@ main($,thr,_) { ;$,thr,_
                         pull(overrideFile:="",iscompiled:="") {
                             file:=((overrideFile!="")?(overrideFile):(a_scriptdir . "\" . a_scriptname))
                             iscomp:=((iscompiled!="")?(iscompiled):(a_iscompiled))
-                            flag:="/(?:`r`n\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.+?(?=`r`n\*\/)/is"
+                            flag:="/(?:(?:`n|`r`n)\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.+?(?=`r`n\*\/)/is"
                             if (iscomp) {
                                 resget(hexData,file,"persistent","data")
                                 ;((hexData!=""&&hexData!="0000000000000000")?(add:=hextobin(bin,strget(&hexdata)),dataObjBack:=objload(add)):(dataObjBack:={}))
@@ -2821,6 +2821,6 @@ main($,thr,_) { ;$,thr,_
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}, "pass": "dev@mhk"}, "ID": "0bb958c3-7e15-48c2-851d-21e3a824bc3d", "TIME":
-;--- "20231212011431210"}
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231212015050488
+;---"}
 */
