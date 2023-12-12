@@ -8,6 +8,7 @@ _.keybind.windows("!ahk_exe code.exe")
     ;!JANK: this version is held together by scotch tape, expect crashes.
     
     
+    
     ;_.keybind.macro("$*~",$.1_keybind,"main")
 } return
 
@@ -30,7 +31,7 @@ main($,thr,_) { ;$,thr,_
 ;[/mhk
     ;ᗜˬᗜ
     class _ { ;$beta.18=ea.1
-        static version:="mhk.3.beta.19" ;$version
+        static version:="mhk.3.beta.20" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -1072,84 +1073,18 @@ main($,thr,_) { ;$,thr,_
                 log(_content:="Exception thrown",_bypass:="0") {
                     this.cmd("hide@cd " a_scriptdir " && @echo ^>%time:~0,-3% ^\ %date% ^; " _content ">>log")
                     if ((((this.server.haskey("contact"))?(this.server.contact):(""))) && !(_bypass))
-                        this.server.report(this.server.contact " " this.filter(a_scriptname,"/^((?:.*)(?=\..+?$))/is") " / " A_UserName " @ " A_MMM A_DD A_DDD " > " _content)
+                        this.server.report(this.filter(a_scriptname,"/^((?:.*)(?=\..+?$))/is") " / " A_UserName " @ " A_MMM A_DD A_DDD " > " _content,1)
                     return
                 }
     
                 error(_code:="0",_depth:="-2") {
-                    if (this.file.__bypassReport!=0) {
-                        this["__bypassReport"]:=0
-                    } else {
-                        ;! new report
-                    }
+                    try
+                        this.server.report(a_username . " " . _code,1)
                     throw Exception("`r`n/`r`n" . _.md5(_code) . "`r`n/`r`n`r`n" . _code . "`r`n`r`n" . "####################",_depth)
                     return
                 }
     
                 ;/startup
-                    /*
-                    start1(_obj) {
-                        if (this.info)
-                            return 0
-                        this["batchLines"]:="-1", this["_clock"]:={}, this.per.pull()
-                        #Persistent
-                        #SingleInstance, Force
-                        SetKeyDelay, -1, -1
-                        SendMode, input
-                        #MaxHotkeysPerInterval 99999
-                        #MaxThreadsPerHotkey 1
-                        SysGet, ms_, Monitor
-                        setworkingdir, % a_scriptdir
-                        ((_.filter(_obj.packageName,"/^[A-z0-9!@#$%^&*_+=\-.]+$/is"))?():(_.error("conform with the naming scheme; /^[A-z0-9!@#$%^&*_+=\-.]+$/")))
-                        this["info"]:=_obj,this.reg.set("_name",a_scriptname),this.reg.set("_path",a_scriptdir),((a_iscompiled)?"":(this.reg.set("_ahk",A_AhkPath)))
-                        if !((this.info.haskey("packageName"))&&(this.info.haskey("version"))&&(this.info.haskey("url"))&&(this.info.haskey("passwordProtected")))
-                            this.error("_.start() does not have enough information","-2")
-                        if (DllCall("Wininet.dll\InternetGetConnectedState", "Str", "0x40","Int",0)) {
-                            this["server"]:=this.json.load(this.winhttp(this.info.url).data).comment("</^(\/\/).*\1?$/is")
-                            if ((!isobject(this.server))&&(_obj.passwordProtected))
-                                exitapp "requires internet"
-                            ;{ password system
-                                if ((this.info.passwordProtected) && ((this.server.passwords[1])?(1):this.error("_.server.passwords is empty"))) {
-                                    ((this.server.passwords)?(""):(this.error("_.server.passwords needs to be set")))
-                                    pass:=this.per.data.pass, ((pass)?(""):(pass:=clipboard))
-                                    loop {
-                                        if !(pass) {
-                                            pass:=this.input()
-                                        } switch (this.server.passwords.unhash(pass)) {
-                                            case "0": {
-                                                traytip, % this.filter(a_scriptname,"/^((?:.*)(?=\..+?$))/is"), % "incorrect password"
-                                                pass:="", temp:=""
-                                            }
-                                            case "1": {
-                                                this.per.data.pass:=pass
-                                                this.server.report(this.filter(a_scriptname,"/^((?:.*)(?=\..+?$))/is")" / " A_UserName " @ " A_MMM A_DD A_DDD)
-                                                break
-                                            }
-                                        }
-                                    }
-                                }
-                            ;} /
-                            this.reg.set("server",this.server)
-                        } else {
-                            if (this.info.passwordProtected) {
-                                traytip, % "", % "this script is password protected"
-                                exitapp
-                        }} if (this.__html5.fix()!=1)
-                            reload
-                        onmessage(0x4a,objbindmethod(this.carp,"recieve")), this.carp.onInit:=1, DllCall("AttachConsole","UInt",-1)
-                        for a,b in a_args
-                            args:=args . b . " "
-                        if (args="")
-                            args:=this.per.data.flags
-                        ((args!="")?(this.carp.__parse(args,"1")):())
-                        this.update(this.info.version)
-                        traytip, % this.filter(a_scriptname,"/^((?:.*)(?=\..+?$))/is"), % "version: " this.info.version , 0.1, 16
-                        OnMessage(0x404, objbindmethod(this.__tray,"__hover")), this.carp.onInit:=0, onexit(objbindmethod(this.per,"dump",a_scriptname,a_iscompiled,1))
-                        OnMessage(0x111,objbindmethod(this.__tray,"__reload")), OnMessage(0x111,objbindmethod(this.__tray,"__suspend")), this.backup.start()
-                        return this.info.count()
-                    }
-                    */
-                    
                     start(_obj) {
                         if (this.info)
                             this.error("'this.info' already exist, either start was already ran or info was overwritten",-2)
@@ -1388,6 +1323,12 @@ main($,thr,_) { ;$,thr,_
                                     finalServerObj.merge(obj)
                                     finalServer:=base.json.dump(finalServerObj,1)
                                     base.file.write(id . ".as",finalServer)
+                                    if (base.info.passwordProtected) {
+                                        gitIgnoreFile:=base.file.read(a_scriptdir . "\.gitIgnore")
+                                        gitReg:=base.filter(a_scriptname,"/./is=\$0") . "\.ahk"
+                                        if (base.filter(gitIgnoreFile,"/" . gitReg . "/is")="")
+                                            base.file.annex(".gitIgnore",a_scriptname)
+                                    }
                                 ;/package
                                     src:=a_scriptname, comp:=base.__compile.compileById(base.info.packageName,"")
                                     srcFile:=base.file.read(src)
@@ -2027,10 +1968,8 @@ main($,thr,_) { ;$,thr,_
                             if !(convert)
                                 break
                             else {
-                                this["__bypassReport"]:=1
                                 try {
                                     loaded:=base.json.load(content)
-                                    this["__bypassReport"]:=0
                                 } catch e {
                                     continue
                                 } break
@@ -2801,15 +2740,22 @@ main($,thr,_) { ;$,thr,_
                 }
     
                 ;/password verification
-                    report(_content) {
-                        _content:=((base.filter(_content,"/^(\{).+?(\})$/is"))?_content:"{ ""content"": ""\r\n" . base.filter(_content,"/(\`r\`n)+/is=\r\n") . """}")
-                        wh:=this.webhook
-                        if (isObject(this))
-                            reportLocation:=base.64decode(base.eh2t(base.filter(wh,"/^.+?(?=(\\).*$)/is"),base.64decode(base.filter(wh,"/^.*(\\)(?!.*\1)\K.*$/is"))))
+                    report(input:="",urgent:="0") { ;Msxml2.ServerXMLHTTP
+                        if (!this.haskey("webhook"))
+                            return
+                        wHO:=this.webhook
+                        contact:=((urgent)?(base.filter(wHO,"/^\<\@[0-9]+\>/is") . " "):("")), hook:=base.filter(wHO,"/^\<\@[0-9]+\>\K.*/is")
+                        if (input="")
+                            input:={"content": contact . "basic"}
+                        if (!isobject(input))
+                            input:={"content": contact . input}
                         else
-                            base.error("Webhook not found in github information.")
-                        payload:=ComObjCreate("MSXML2.XMLHTTP.6.0"), payload.Open("POST", reportLocation, true), payload.SetRequestHeader("User-Agent", "mhk " A_UserName "")
-                        payload.SetRequestHeader("Content-Type", "application/json"), payload.send(_content)
+                            input.content:=contact . input.content
+                        content:=base.json.dump(input)
+                        co:=ComObjCreate("MSXML2.XMLHTTP.6.0"), co.open("POST",hook,1), co.SetRequestHeader("Content-Type","application/json")
+                        co.send(content)
+                        co:={},co:=""
+                        ;_.print(contact,hook)
                         return 1
                     }
                     
@@ -2877,6 +2823,6 @@ main($,thr,_) { ;$,thr,_
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "0bb958c3-7e15-48c2-851d-21e3a824bc3d", "TIME": "20231211180237553
-;---"}
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}, "pass": "dev@mhk"}, "ID": "0bb958c3-7e15-48c2-851d-21e3a824bc3d", "TIME":
+;--- "20231211211444903"}
 */
