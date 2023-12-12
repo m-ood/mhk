@@ -31,7 +31,7 @@ main($,thr,_) { ;$,thr,_
 ;[/mhk
     ;ᗜˬᗜ
     class _ { ;$beta.18=ea.1
-        static version:="mhk.3.beta.20" ;$version
+        static version:="mhk.3.beta.21" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -270,12 +270,6 @@ main($,thr,_) { ;$,thr,_
                                 addr:=NumPut((b.event | (8) | (b.sc >> 8)),NumPut(b.sc & 255,NumPut(1,addr+0)+2,"UShort"),"UInt")+ptrEnd
                             dllcall(this.siAdd, "UInt", size, "Ptr", &INPUTS, "Int", this.InputSize)
                             return
-                            /*
-                                if (b.type=0) {
-                                    DllCall("mouse_event", "UInt", b.sc)
-                                    continue
-                                }
-                            */
                         }
 
                         parseCKeys(keys*) {
@@ -348,6 +342,7 @@ main($,thr,_) { ;$,thr,_
                             return
                         }
 
+                        /*
                         __reload(wParam, lParam, msg, hWnd,bypass:="") {
                             if (((msg = 0x111) && (wParam = 65303))||(bypass="bypass")) {
                                 this.reload(1)
@@ -361,6 +356,7 @@ main($,thr,_) { ;$,thr,_
                             }
                             return
                         }
+                        */
                     }
                 
                 ;/titlebar
@@ -508,6 +504,7 @@ main($,thr,_) { ;$,thr,_
                         iscomp:=a_iscompiled
                         if !(iscomp) {
                             this.per.dump()
+                            this.per.override:=1
                             if (isActualReload="")
                                 reload
                             return
@@ -530,6 +527,7 @@ main($,thr,_) { ;$,thr,_
                             . "lt)))" ;$ resource dump powershell script for exe persistence /\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|/\|
                             . ";Start-Process -filepath '" . (nm) . "';"
                             this.ps.import(src,"exePersDump"), this.ps.exePersDump()
+                            this.per.override:=1
                             exitapp
                             return
                         }
@@ -2824,5 +2822,5 @@ main($,thr,_) { ;$,thr,_
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
 ;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}, "pass": "dev@mhk"}, "ID": "0bb958c3-7e15-48c2-851d-21e3a824bc3d", "TIME":
-;--- "20231211211444903"}
+;--- "20231212011431210"}
 */
