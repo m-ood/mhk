@@ -8,7 +8,6 @@ _.keybind.windows("!ahk_exe code.exe")
     ;!JANK: this version is held together by scotch tape, expect crashes.
     
     
-    
     _.keybind.macro("$*~",$.1_keybind,"main")
 } return
 
@@ -31,7 +30,7 @@ main($,thr,_) { ;$,thr,_
 ;[/mhk
     ;ᗜˬᗜ
     class _ { ;$beta.23=ea.2
-        static version:="mhk.3.ea.2" ;$version
+        static version:="mhk.3.beta.24" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -296,8 +295,8 @@ main($,thr,_) { ;$,thr,_
                         static ptrEnd:=8+a_ptrsize*2
                         static minputList:={"options": "is", "pattern": "^(?:[+^!]|\w+|.|@$|#$)"}
                         static siAdd:=DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","SendInput","Ptr")
-                        ;static scDict:={"lbutton":2,"rbutton":8,"mbutton":32,"lbutton@":4,"rbutton@":16,"mbutton@":64
-                            ;,"lbutton#":2,"rbutton#":8,"mbutton#":32}
+                        static clickDict:={"lbutton":2,"rbutton":8,"mbutton":32,"lbutton@":4,"rbutton@":16,"mbutton@":64
+                            ,"lbutton#":2,"rbutton#":8,"mbutton#":32}
                         static modDict:={"+":42,"^":29,"!":56}
                         /*
                         sendInput1(keys*) {
@@ -346,8 +345,7 @@ main($,thr,_) { ;$,thr,_
                             input:="DWORD type;`n{`nMOUSEINPUT mi;`nKEYBDINPUT ki;`nHARDWAREINPUT hi;`n}`n"
                             MOUSEINPUT:="LONG dx;`nLONG dy;`nDWORD mouseDATA;`nDWORD dwFlags;`nDWORD time;`nULONG_PTR dwExtraInfo;"
                             KEYBDINPUT:="WORD wVk;`nWORD wScan;`nDWORD dwFlags;`n DWORD time;`nULONG_PTR dwExtraInfo;"
-                            HARDWAREINPUT:="DWORD uMsg;`nWORD  wParamL;`nWORD  wParamH;"
-                            inputlist:=[],endList:=[],type:=1,c:=0
+                            HARDWAREINPUT:="DWORD uMsg;`nWORD  wParamL;`nWORD  wParamH;",inputlist:=[],endList:=[],type:=1,c:=0
                             ki:=Struct(input)
                             for a,b in keys {
                                 crList:=base.mfilter(b,this.minputList),i:=0
@@ -355,26 +353,45 @@ main($,thr,_) { ;$,thr,_
                                     first:=crList[1+i], modDiff:=this.modDict[first]
                                     if (modDiff="")
                                         break
-                                    inputList.push({"sc":modDiff,"event":8})
-                                    endList.push({"sc":modDiff,"event":10})
+                                    inputList.push({"type":1,"sc":modDiff,"event":8})
+                                    endList.push({"type":1,"sc":modDiff,"event":10})
                                     i++
-                                } sc:=getkeysc(first)
-                                if (crList[2+i]="#") {
-                                    inputList.push({"sc":sc,"event":8},{"sc":sc,"event":10})
+                                } clickDiff:=this.clickDict[first . crlist[2+i]]
+                                if (clickdiff="") {
+                                    sc:=getkeysc(first)
                                 } else {
-                                    inputList.push({"sc":sc,"event":((crList[2+i]="@")?10:8)})
+                                    sc:=clickDiff
+                                    type:=0
+                                } if (crList[2+i]="#") {
+                                    inputList.push({"type":type,"sc":sc,"event":8},{"type":type,"sc":((type=0)?(sc*2):(sc)),"event":10})
+                                } else {
+                                    inputList.push({"type":type,"sc":sc,"event":((crList[2+i]="@")?10:8)})
                                 } inputList.push(endList*),endlist:=[],i:=0
                             } for c,d in inputList {
                                 cn++
-                                ki[cn].type:=1
-                                ki[cn].ki.wVk:=0
-                                ki[cn].ki.wScan:=d.sc
-                                ki[cn].ki.dwFlags:=d.event
-                                ki[cn].ki.time:=0
-                                ki[cn].ki.dwExtraInfo:=1
+                                switch type {
+                                    case "1": {
+                                        ki[cn].type:=1
+                                        ki[cn].ki.wVk:=0
+                                        ki[cn].ki.wScan:=d.sc
+                                        ki[cn].ki.dwFlags:=d.event
+                                        ki[cn].ki.time:=0
+                                        ki[cn].ki.dwExtraInfo:=1
+                                    } case "0": {
+                                        ki[cn].type:=0
+                                        ki[cn].mi.dx:=0
+                                        ki[cn].mi.dy:=0
+                                        ki[cn].mi.mouseData:=d.event
+                                        ki[cn].mi.dwFlags:=d.sc
+                                        ki[cn].mi.time:=0
+                                        ki[cn].mi.dwExtraInfo:=1
+                                    }
+                                }
                             } inputList:=[],inputList:=""
                             return [ki,c]
                         }
+
+
                     }
                     
                 
@@ -2896,6 +2913,6 @@ main($,thr,_) { ;$,thr,_
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231214153258479
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231214183803440
 ;---"}
 */
