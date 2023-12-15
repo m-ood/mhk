@@ -8,6 +8,7 @@ _.keybind.windows("!ahk_exe code.exe")
     ;!JANK: this version is held together by scotch tape, expect crashes.
     
     
+    
     _.keybind.macro("$*~",$.1_keybind,"main")
 } return
 
@@ -16,7 +17,7 @@ _.keybind.windows("!ahk_exe code.exe")
 
 
 main($,thr,_) { ;$,thr,_
-    @:=_.anchor, key:="e" ;key:=$.2_rebind
+    @:=_.anchor, key:=$.2_rebind
     _.send(key), @.when("+2")
     ;thr.wait() ;? uncomment 4 rebind
     _.send(key . "@"), @.when("+2")
@@ -30,7 +31,7 @@ main($,thr,_) { ;$,thr,_
 ;[/mhk
     ;ᗜˬᗜ
     class _ { ;$beta.23=ea.2
-        static version:="mhk.3.beta.24" ;$version
+        static version:="mhk.3.beta.25" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -295,8 +296,7 @@ main($,thr,_) { ;$,thr,_
                         static ptrEnd:=8+a_ptrsize*2
                         static minputList:={"options": "is", "pattern": "^(?:[+^!]|\w+|.|@$|#$)"}
                         static siAdd:=DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","SendInput","Ptr")
-                        static clickDict:={"lbutton":2,"rbutton":8,"mbutton":32,"lbutton@":4,"rbutton@":16,"mbutton@":64
-                            ,"lbutton#":2,"rbutton#":8,"mbutton#":32}
+                        static clickDict:={"lbutton":2,"rbutton":8,"mbutton":32}
                         static modDict:={"+":42,"^":29,"!":56}
                         /*
                         sendInput1(keys*) {
@@ -356,7 +356,7 @@ main($,thr,_) { ;$,thr,_
                                     inputList.push({"type":1,"sc":modDiff,"event":8})
                                     endList.push({"type":1,"sc":modDiff,"event":10})
                                     i++
-                                } clickDiff:=this.clickDict[first . crlist[2+i]]
+                                } clickDiff:=this.clickDict[first]
                                 if (clickdiff="") {
                                     sc:=getkeysc(first)
                                 } else {
@@ -365,7 +365,13 @@ main($,thr,_) { ;$,thr,_
                                 } if (crList[2+i]="#") {
                                     inputList.push({"type":type,"sc":sc,"event":8},{"type":type,"sc":((type=0)?(sc*2):(sc)),"event":10})
                                 } else {
-                                    inputList.push({"type":type,"sc":sc,"event":((crList[2+i]="@")?10:8)})
+                                    if (crList[2+i]="@") {
+                                        if (type=0)
+                                            sc:=sc*2
+                                        event:=10
+                                    } else {
+                                        event:=8
+                                    } inputList.push({"type":type,"sc":sc,"event":event})
                                 } inputList.push(endList*),endlist:=[],i:=0
                             } for c,d in inputList {
                                 cn++
@@ -2913,6 +2919,6 @@ main($,thr,_) { ;$,thr,_
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231214183803440
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231215172229646
 ;---"}
 */
