@@ -1,25 +1,24 @@
 _.start({"packageName":"mloop", "version":"1", "url":"https://raw.githubusercontent.com/m-ood/mhk/main/mloop.as", "passwordProtected":"0"})
 global $:=_.params({"1_keybind":"q", "2_rebind":"e"})
-_.keybind.windows("!ahk_exe code.exe")
+#if ((!winactive("ahk_exe code.exe")))
 {
     ;! obsidian object types
     ;! move documentation to obsidian
     ;! actually write all the documentation lol
-    ;!JANK: this version is held together by scotch tape, expect crashes.
+    ;@ this version is held together by duct tape ᗜˬᗜ
     
     
-    
-    _.keybind.macro("$*~",$.1_keybind,"main")
+    obj:=_.keybind.macro("$*~",$.1_keybind,"main")
 } return
 
 
 
 
 
-main($,thr,_) { ;$,thr,_
+main() {
     @:=_.anchor, key:=$.2_rebind
     _.send(key), @.when("+2")
-    ;thr.wait() ;? uncomment 4 rebind
+    ;_.wait() ;? uncomment 4 rebind
     _.send(key . "@"), @.when("+2")
     return
 }
@@ -30,26 +29,11 @@ main($,thr,_) { ;$,thr,_
 
 ;[/mhk
     ;ᗜˬᗜ
-    class _ { ;$beta.23=ea.2
-        static version:="mhk.3.beta.25" ;$version
+    class _ { ;$beta.26=ea.3
+        static version:="mhk.3.ea.3" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
-                ;/__hotkey
-                    hotkey(_option:="$",_hotkey:="",_function:="",_toggle:="") {
-                        this.__hotkey.convert(_option,_hotkey,_function,_toggle)
-                        return
-                    }
-    
-                    class __hotkey extends _ {
-                        convert(_option,_hotkey,_function,_toggle) {
-                            modCheck:=((base.filter(_hotkey,"/[\#\!\^\+\&\<\>\*\~\$]+/is"))?(_hotkey):(_option . _hotkey)), compHk:=base.t2h(modCheck)
-                            ((isfunc(_function))?(this[compHk]:=Func(_function).Bind($)):(((isobject(_function))?(this[compHk]:=_function):(base.error("invalid function")))))
-                            hotkey, % modCheck, % "_系统标签", % _toggle
-                            return
-                        }
-                    }
-                
                 ;/BETTER HOTKEY YIPEE
                     class keybind extends _ {
                         static private
@@ -62,90 +46,65 @@ main($,thr,_) { ;$,thr,_
                             if (hotkey="")
                                 base.error("invalid hotkey","-2")
                             modCheck:=((base.filter(hotkey,base.patterns.hkStrip))?(hotkey):(modifiers . hotkey)), id:=base.md5(modCheck)
-                            hotkeyOnly:=base.filter(modCheck,base.patterns.hkOnly),modOnly:=base.filter(modCheck,base.patterns.modOnly)
-                            this.hkRef[id]:={}
+                            keyOnly:=base.filter(modCheck,base.patterns.hkOnly),modOnly:=base.filter(modCheck,base.patterns.modOnly)
                             if (this.hkThread.haskey(id)) {
                                 this.close(id)
-                            } hotkeyThreadInfo:=this.__createHotkeyThread(modCheck,hotkeyOnly,func2,id,args*)
-                            ;hotkeyThradInfo:=this.__createStagnantHotkeyThread(modCheck,hotkeyOnly,func2,id,args*)
-                            finalObj:={"modifiers":modOnly,"hotkey":hotkeyOnly,"id":id}
-                            for a,b in hotkeyThreadInfo
-                                finalObj[a]:=b
+                            } this.hkRef[id]:={}, func:=base.funcLiteral(func2,args*), this.hkref[id].func:=func, this.hkdict[modcheck]:=id
+                            this.hkRef[id].key:=keyOnly, this.hkRef[id].mod:=modOnly, this.hkRef[id].status:="On"
+                            ;hotkeyThreadInfo:=this.__createHotkeyThread(modCheck,keyOnly,func2,id,args*)
+                            hotkey, % modcheck, % "_系统标签", % "On"
+                            finalObj:={"modifiers":modOnly,"hotkey":keyOnly,"id":id}
+                            finalObj["path"]:=this.hkRef[id].func.path
                             finalObj["close"]:=objbindmethod(this,"close",id)
-                            finalObj["suspend"]:=objbindmethod(this,"suspend",id,"")
+                            finalObj["open"]:=objbindmethod(this,"open",id)
+                            ;finalObj["suspend"]:=objbindmethod(this,"suspend",id,"")
                             return finalObj
                         }
 
-                        __createHotkeyThread(hotkey,key,function,id,args*) {
+                        _groupTestStuff(hotkey,key,function,id,args*) {
                             this.hkRef[id].func:=base.funcLiteral(function,this.args2bind,this.hkref[id],args*)
                             this.hkRef[id].key:=key, this.hkRef[id].status:="on"
                             ;shareType:="mhk:=objShare(" . objshare(_) . ")`n" ;$share
                             ;shareType:="mhk:=objShare(" . objshare(_.fco(_)) . ")`n" ;$clone share
                             ;co:=criticalObject(_.fco(_)),shareType:="global mhk:=criticalObject(" . (&co) . ")`n" ;$clone critcal
-                            argsCo:=criticalObject(args),paramsRef:=objshare(this.args2Bind),safeRef:=objshare(_),path:=this.hkref[id].func.path ;$ \
+
+                            ;this.hkref[id].func.path
+                            argsCo:=objshare(args),paramsRef:=objshare(this.args2Bind.clone()),safeRef:=objshare(_),path:=function ;$ \
+
+                            collection:="thr:={""key"":""" . key . """,""unsafe"":mhk,""safe"":objshare(" . safeRef . ")}`n" ;,""wait"":func(""kw"").bind(""" . key . """)
+
+                            ;
                             trayIcon:="#noTrayIcon`n",c:=criticalObject(_),shareTypeORef:="mhk:=criticalObject(" . &c . ")`n",thread:="#persistent`n"
                              . trayIcon . "setbatchlines, % ""-1""`nSetKeyDelay, -1, -1`nSendMode, input`n#MaxHotkeysPerInterval 99999`n#MaxThreadsP"
-                             . "erHotkey 1`n" . this.allowedWindows . shareTypeORef . "hotkey, % """ . hotkey . """, % """ . id . """`nglobal func:="
-                             . this.__Class . ".hkRef." . id . ".func.func`nobj1:=objshare(" . paramsRef . ")`nthr:={""key"":""" . key . """,""wait" 
-                             . """:func(""kw"").bind(""" . key . """),""keyState"":func(""keystate"").bind(""" . key . """,""P""),""unsafe"":mhk,""s"
-                             . "afe"":objshare(" . safeRef . ")}`nobj4:=criticalObject(" . &argsCo . ")`nglobal func:=mhk.funcliteral(""" . path . ""
-                             . """,obj1,thr,_,obj4*)`nreturn`nturnOff(string:="""") {`nsuspend, % string`nreturn`n}`nkw(key) {`nkeywait, % key`nretu"
-                             . "rn`n}`nkeyState(key,p:="""") {`nreturn (getkeystate(key,p))`n}`nforce() {`nreturn`n}`n" . id . ":`n{`nif (getkeystat"
-                             . "e(""" . key . """,""P""))`nfunc.call()`n}" ;$ compressed mhk keybind.macro thread :o
-                            this.hkRef[id].thr:=ahkthread(thread . "`n" . base.export() . "`n")
-                            loop {
-                                sleep, 1
-                                temp:=this.hkRef[id].thr.ahkgetvar["func"]
-                            } until (temp!="")
-                            ;this.hkref[id].wait:=objbindmethod(this.hkRef[id].thr,"ahkFunction","kw",key)
-                            ;_.print(thread)
-                            ;objbindmethod(this.base,"wait",key)
-                            ;_.print(objbindmethod(this.hkRef[id].thr,"ahkFunction",key))
-                            ;_.print(objshare(_.keybind.hkref[id]))
-                            return {"func":this.hkRef[id].func,"debug":objbindmethod(this,"__threadDebug",thread,id)}
-                        }
-
-                        __createStagnantHotkeyThread(hotkey,key,function,id,args*) {
-                            ;this.hkRef[id].func:=base.funcLiteral(function,this.args2bind,this.hkref[id],args*)
-                            this.hkref[id].func:=function
-                            this.hkRef[id].key:=key, this.hkRef[id].hotkey:=hotkey, this.hkRef[id].status:="on"
-
-                            argsCo:=criticalObject(args),paramsRef:=objshare(this.args2Bind),safeRef:=objshare(_),path:=this.hkref[id].func ;$ \
-                            trayIcon:="#noTrayIcon`n",c:=criticalObject(_),shareTypeORef:="mhk:=criticalObject(" . &c . ")`n",thread:="#persistent`n"
-                             . trayIcon . "setbatchlines, % ""-1""`nSetKeyDelay, -1, -1`nSendMode, input`n#MaxHotkeysPerInterval 99999`n#MaxThreadsP"
-                             . "erHotkey 1`n" . shareTypeORef . "obj1:=objshare(" . paramsRef . ")`nthr:={""key"":""" . key . """,""wait"":func(""kw"
-                             . """).bind(""" . key . """),""keyState"":func(""keystate"").bind(""" . key . """,""P""),""unsafe"":mhk,""safe"":objsha"
-                             . "re(" . safeRef . ")}`nobj4:=criticalObject(" . &argsCo . ")`nglobal func:=mhk.funcliteral(""" . path . """,obj1,thr,"
-                             . "_,obj4*)`nreturn`nturnOff(string:="""") {`nsuspend, % string`nreturn`n}`nkw(key) {`nkeywait, % key`nreturn`n}`nkeySt"
-                             . "ate(key,p:="""") {`nreturn (getkeystate(key,p))`n}`nf2rit()`n{`nstatic running`nif(running=1)`nreturn`n"
-                             . "`nrunning:=1`nfunc.call()`nrunning:=0`nreturn`n}"
-                            ;$ compressed mhk keybind.macro thread :o
-                            ;? f2rit
-                            hotkey, % hotkey, % "_系统标签", % "on"
-                            this.hkDict[hotkey]:=id
-                            this.hkRef[id].thr:=ahkthread(thread . "`n" . base.export() . "`n")
+                             . "erHotkey 1`n" . this.allowedWindows . shareTypeORef . "hotkey, % """ . hotkey . """, % """ . id . """"
+                             . "`nobj1:=objshare(" . paramsRef . ")`n" . collection
+                             . ""
+                             . "obj4:=objshare(" . argsCo . ")`nglobal func:=mhk.funcliteral(""" . path . ""
+                             . """,_)`nreturn`nturnOff(string:="""") {`nsuspend, % string`nreturn`n}`n"
+                             . "" . id . ":`n{"
+                             . "`nfunc.call()`n}" ;$ compressed mhk keybind.macro thread :o
+                            this.hkRef[id].thr:=ahkthread(thread . "`n" . base.export() . "`n") ;obj1,thr,_,obj4*
                             loop {
                                 sleep, 1
                                 temp:=this.hkRef[id].thr.ahkgetvar["func"]
                             } until (temp!="")
                             _.print(thread)
                             ;this.hkref[id].wait:=objbindmethod(this.hkRef[id].thr,"ahkFunction","kw",key)
-                            ;_.print(thread)
                             ;objbindmethod(this.base,"wait",key)
                             ;_.print(objbindmethod(this.hkRef[id].thr,"ahkFunction",key))
                             ;_.print(objshare(_.keybind.hkref[id]))
-                           return {"func":this.hkRef[id].func,"debug":objbindmethod(this,"__threadDebug",thread,id)}
-                        }
-
-                        __threadDebug(thread,id) {
-                            return {"thread":thread,"threadObj":base.keybind.hkref[id]}
+                            return {"func":this.hkRef[id].func,"debug":objbindmethod(this,"__threadDebug",thread,id)}
                         }
 
                         close(id) {
-                            this.hkref[id].thr.ahkPause("on"),this.hkref[id].thr.ahkFunction("turnOff","on"),this.hkref[id].thr.ahkTerminate()
-                            hotkey, % this.hkref[id].hotkey, % "_系统标签","off"
-                            this.hkref.delete(id)
+                            hotkey, % this.hkref[id].hotkey,, % "Off"
+                            this.hkref[id].status:="Off"
                             return
+                        }
+
+                        open(id) {
+                            hotkey, % this.hkref[id].hotkey,, % "On"
+                            this.hkref[id].status:="On"
                         }
 
                         closeAll() {
@@ -186,7 +145,7 @@ main($,thr,_) { ;$,thr,_
                                 flatWT.=b . " "
                             waflatwt:="( " . base.filter(flatWT,base.patterns.keybindWindows) . ")"
                             ;DetectHiddenWindows, On`nsettitlematchmode, 2`n
-                            this.allowedWindows:="#if " . waFlatWt . "`n"
+                            this.allowedWindows:="" . waFlatWt . ""
                             ;this.allowedWindows:=waFlatWt
                              ;. "#if (!winActive(""mloop ahk_class AutoHotkey""))`n"
                             return this.allowedWindows
@@ -195,15 +154,12 @@ main($,thr,_) { ;$,thr,_
                     
                 
                 ;/time
-                    wait(key:="") {
-                        if ((a_thishotkey="")&&(key=""))
-                            ;this.error("wait doesn't work in threads","-2")
-                            return
+                    wait(key:="",logi:="") {
                         if (key="") {
-                            keywait, % this.hk
+                            keywait, % this.hk, % logi
                             return
                         }
-                        keywait, % key
+                        keywait, % key, % logi
                         return
                     }
     
@@ -298,40 +254,6 @@ main($,thr,_) { ;$,thr,_
                         static siAdd:=DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","SendInput","Ptr")
                         static clickDict:={"lbutton":2,"rbutton":8,"mbutton":32}
                         static modDict:={"+":42,"^":29,"!":56}
-                        /*
-                        sendInput1(keys*) {
-                            ;keyObj:=((isobject(keys[1]))?(keys[1]):(this.parseCKeys(keys*)))
-                            keyObj:=this.parseCKeys(keys*)
-                            ptrs:=this.ptrs,size:=keyObj.count(),VarSetCapacity(INPUTS, this.InputSize * size, 0),addr:=&INPUTS,ptrEnd:=this.ptrEnd
-                            for a,b in keyObj
-                                addr:=NumPut((b.event | (8) | (b.sc >> 8)),NumPut(b.sc & 255,NumPut(1,addr+0)+2,"UShort"),"UInt")+ptrEnd
-                            dllcall(this.siAdd, "UInt", size, "Ptr", &INPUTS, "Int", this.InputSize)
-                            return
-                        }
-
-                        parseCKeys1(keys*) {
-                            inputlist:=[],endList:=[],type:=1
-                            for a,b in keys {
-                                crList:=base.mfilter(b,this.minputList),i:=0
-                                loop {
-                                    first:=crList[1+i], modDiff:=this.modDict[first]
-                                    if (modDiff="")
-                                        break
-                                    inputList.push({"type":type,"sc":modDiff,"event":0})
-                                    endList.push({"type":type,"sc":modDiff,"event":2})
-                                    i++, tempSc:=""
-                                } sc:=getkeysc(first)
-                                if (crList[2+i]="#") {
-                                    inputList.push({"type":type,"sc":sc,"event":0},{"type":1,"sc":sc,"event":2})
-                                } else {
-                                    inputList.push({"type":type,"sc":sc,"event":((crList[2+i]="@")?2:0)})
-                                } if (endList.count()!=0) {
-                                    inputList.push(endList*)
-                                    endlist:=[],i:=0
-                                }
-                            } return inputList
-                        }
-                        */
 
                         sendInput(keys*) {
                             data:=this.parseCKeys(keys*),ki:=data[1],count:=data[2]
@@ -401,35 +323,6 @@ main($,thr,_) { ;$,thr,_
                     }
                     
                 
-                ;/click
-                    class click extends _ {
-                        static meAdd:=DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","mouse_event","Ptr")
-                        left(type:="1") {
-                            if (type)
-                                DllCall(this.meAdd, "UInt",0x02)
-                            else
-                                DllCall(this.meAdd, "UInt",0x04)
-                            return
-                        }
-
-                        right(type:="1") {
-                            if (type)
-                                DllCall(this.meAdd, "UInt",0x08)
-                            else
-                                DllCall(this.meAdd, "UInt",0x10)
-                            return
-                        }
-
-                        middle(type:="1") {
-                            if (type)
-                                DllCall(this.meAdd, "UInt",0x20)
-                            else
-                                DllCall(this.meAdd, "UInt",0x40)
-                            return
-                        }
-                    }
-
-                
             
             ;/qol
                 ;/trayCLick
@@ -445,22 +338,6 @@ main($,thr,_) { ;$,thr,_
                             }
                             return
                         }
-
-                        /*
-                        __reload(wParam, lParam, msg, hWnd,bypass:="") {
-                            if (((msg = 0x111) && (wParam = 65303))||(bypass="bypass")) {
-                                this.reload(1)
-                            }
-                            return
-                        }
-
-                        __suspend(wParam, lParam, msg, hWnd,bypass:="") {
-                            if (((msg = 0x111) && ((wParam = 65404)||(wParam = 65305)))||(bypass="bypass")) {
-                                this.suspend(1)
-                            }
-                            return
-                        }
-                        */
                     }
                 
                 ;/titlebar
@@ -2910,6 +2787,12 @@ main($,thr,_) { ;$,thr,_
                 return prms
             }
 
+            _系统标签:
+            {
+                _.keybind.hkref[_.keybind.hkdict[a_thishotkey]].func.call()
+                return
+            }
+
         /**
          * \  _ __ | |_ | |__       | |_ ___ _ __  _ __| |__ _| |_ ___ 
          * \ | '  \| ' \| / /  ___  |  _/ -_| '  \| '_ | / _` |  _/ -_)
@@ -2919,6 +2802,6 @@ main($,thr,_) { ;$,thr,_
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231215172229646
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231216180315217
 ;---"}
 */
