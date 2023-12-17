@@ -6,9 +6,11 @@ global $:=_.params({"1_keybind":"q", "2_rebind":"e"})
     ;! move documentation to obsidian
     ;! actually write all the documentation lol
     ;@ this version is held together by duct tape ᗜˬᗜ
+    ;#1 multiline strings for functions, figure it out
     
     
-    _.keybind.macro("$*~",$.1_keybind,"main")
+    
+    ;_.keybind.macro("$*~",$.1_keybind,"main")
 } return
 
 
@@ -30,7 +32,7 @@ main() {
 ;[/mhk
     ;ᗜˬᗜ
     class _ { ;$beta.26=ea.3
-        static version:="mhk.3.beta.27" ;$version
+        static version:="mhk.3.beta.28" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -346,8 +348,10 @@ main() {
                     createGroupThread(id,cont) {
                         this.groupList[id]:={},this.groupList[id].status:="on"
                         this.groupList[id].content:=objbindmethod(this,"re",cont),pR:=objshare(this.args2Bind.clone())
+                        data:=objshare(base.data),safe:=objshare(_)
                         thread:=this.allowedWindows . "#noTrayIcon`nsetbatchlines, % ""-1""`nSetKeyDelay, -1, -1`nSendMode, input`n"
-                         . "global $:=objshare(" . pR . ")`nturnOff(string:="""") {`nsuspend, % string`nreturn`n}`n" . cont
+                         . "global $:=objshare(" . pR . "), mainData:=objshare(" . data . "), safeMem:=objshare(" . safe . ")`nturn"
+                         . "Off(string:="""") {`nsuspend, % string`nreturn`n}`n" . cont
                         this.groupList[id].thr:=ahkthread(thread) ;$ group
                         /*
                         loop {
@@ -2849,6 +2853,6 @@ main() {
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231217001619701
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231217072732997
 ;---"}
 */
