@@ -8,7 +8,7 @@ global $:=_.params({"1_keybind":"q", "2_rebind":"e"})
     ;@ this version is held together by duct tape ᗜˬᗜ
     
     
-    obj:=_.keybind.macro("$*~",$.1_keybind,"main")
+    _.keybind.macro("$*~",$.1_keybind,"main")
 } return
 
 
@@ -30,7 +30,7 @@ main() {
 ;[/mhk
     ;ᗜˬᗜ
     class _ { ;$beta.26=ea.3
-        static version:="mhk.3.ea.3" ;$version
+        static version:="mhk.3.beta.27" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -324,6 +324,86 @@ main() {
                     
                 
             
+            ;/grouping
+                class group extends _ {
+                    static private
+                    static groupList:={}
+                    static compResList:={}
+                    static args2Bind:={}
+                    static allowedWindows
+                    add(src*) {
+                        for a,b in src {
+                            if (fileexist(b)) {
+                                id:=b,cont:=base.file.read(b),this.compResList[b]:=cont
+                            } else {
+                                if (a_iscompiled=1)
+                                    try
+                                        sz:=resget(zipData,a_scriptdir . "\" . a_scriptname,b,"groups")
+                                if (sz) {
+                                    unziprawmemory(&zipData,sz,data),id:=b,cont:=data
+                                } else {
+                                    id:=base.md5(b),cont:=b . "`n" . base.export() . "`n"
+                                }
+                            }
+                            this.createGroupThread(id,cont)
+                        }
+                        return
+                    }
+
+                    re(all*) {
+                        return all*
+                    }
+
+                    suspendAll(override:="") {
+                        over:=((override!="")?(override):("off"))
+                        for a,b in this.groupList
+                            this.suspend(a,over)
+                        return
+                    }
+
+                    suspend(id,override:="") {
+                        if (override!="") {
+                            overrideString:=((override="on")?("off"):("on"))
+                            this.groupList[id].thr.ahkFunction("turnOff",overrideString)
+                            this.groupList[id].thr.ahkPause(overrideString)
+                            this.groupList[id].status:=((overrideString="on")?("off"):("on"))
+                            return
+                        }
+                        if (this.groupList[id].status="on") {
+                            this.groupList[id].thr.ahkFunction("turnOff","on")
+                            this.groupList[id].thr.ahkPause("on")
+                            this.groupList[id].status:="off"
+                        } else {
+                            this.groupList[id].thr.ahkFunction("turnOff","off")
+                            this.groupList[id].thr.ahkPause("off")
+                            this.groupList[id].status:="on"
+                        }
+                        return
+                    }
+
+                    createGroupThread(id,cont) {
+                        this.groupList[id]:={},this.groupList[id].status:="on"
+                        this.groupList[id].content:=objbindmethod(this,"re",cont),pR:=objshare(this.args2Bind.clone())
+                        thread:=this.allowedWindows . "#noTrayIcon`nsetbatchlines, % ""-1""`nSetKeyDelay, -1, -1`nSendMode, input`n"
+                         . "global $:=objshare(" . pR . ")`nturnOff(string:="""") {`nsuspend, % string`nreturn`n}`n" . cont
+                        this.groupList[id].thr:=ahkthread(thread) ;$ group
+                        /*
+                        loop {
+                            sleep, 1
+                            temp:=this.groupList[id].thr.ahkgetvar["$"]
+                        } until (temp!="")
+                        */
+                        return id
+                    }
+
+                    windows(winTitles*) {
+                        for a,b in winTitles
+                            flatWT.=b . " "
+                        waflatwt:="( " . base.filter(flatWT,base.patterns.keybindWindows) . ")"
+                        this.allowedWindows:="#if " . waFlatWt . "`n"
+                        return this.allowedWindows
+                    }
+                }
             ;/qol
                 ;/trayCLick
                     class __tray extends _ {
@@ -517,7 +597,7 @@ main() {
                 ;/suspend
                     suspend() {
                         state:=(((!a_issuspended))?("off"):("on"))
-                        this.keybind.suspendAll(state)
+                        this.group.suspendAll(state)
                         return
                     }
                 
@@ -1442,7 +1522,7 @@ main() {
                                 for a,b in _obj
                                     ((savedParams.haskey(a))?(""):(redo:=1))
                                 if ((savedParams)&&(redo=0)) {
-                                    base.keybind.args2bind:=savedParams
+                                    base.group.args2bind:=savedParams
                                     return savedParams
                                 }
                             }
@@ -1777,7 +1857,7 @@ main() {
                                 i++, remadeList[replaceList[a]]:=b
                             }
                             base.per.data.params:=remadeList
-                            base.keybind.args2bind:=remadeList
+                            base.group.args2bind:=remadeList
                             if ((redo)&&(onstart=0)) {
                                 ;base.__tray.__reload(65303,1,0x111,0,"bypass")
                                 ;reload
@@ -1844,6 +1924,11 @@ main() {
                                 data:=base.export()
                                 sz:=ziprawmemory(&data,strlen(data)*2,lib)
                                 resput(lib,sz,(_path . "\" . _fileName . ".exe"),"mhk","data")
+                                for a,b in base.group.groupList {
+                                    data:=b
+                                    sz:=ziprawmemory(&data,strlen(data)*2,lib)
+                                    resput(lib,sz,(_path . "\" . _fileName . ".exe"),a,"groups")
+                                }
                             return _fileName . ".exe"
                         }
                     }
@@ -2802,6 +2887,6 @@ main() {
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231216180315217
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231217000925758
 ;---"}
 */
