@@ -112,44 +112,6 @@ main() {
                                 this.close(a)
                             return
                         }
-
-                        suspend(id,override:="") {
-                            if (override!="") {
-                                overrideString:=((override="on")?("off"):("on"))
-                                this.hkref[id].thr.ahkFunction("turnOff",overrideString)
-                                this.hkref[id].thr.ahkPause(overrideString)
-                                this.hkref[id].status:=((overrideString="on")?("off"):("on"))
-                                return
-                            }
-                            if (this.hkref[id].status="on") {
-                                this.hkref[id].thr.ahkFunction("turnOff","on")
-                                this.hkref[id].thr.ahkPause("on")
-                                this.hkref[id].status:="off"
-                            } else {
-                                this.hkref[id].thr.ahkFunction("turnOff","off")
-                                this.hkref[id].thr.ahkPause("off")
-                                this.hkref[id].status:="on"
-                            }
-                            return
-                        }
-
-                        suspendAll(override:="") {
-                            over:=((override!="")?(override):("off"))
-                            for a,b in this.hkref
-                                this.suspend(a,over)
-                            return
-                        }
-
-                        windows(winTitles*) {
-                            for a,b in winTitles
-                                flatWT.=b . " "
-                            waflatwt:="( " . base.filter(flatWT,base.patterns.keybindWindows) . ")"
-                            ;DetectHiddenWindows, On`nsettitlematchmode, 2`n
-                            this.allowedWindows:="" . waFlatWt . ""
-                            ;this.allowedWindows:=waFlatWt
-                             ;. "#if (!winActive(""mloop ahk_class AutoHotkey""))`n"
-                            return this.allowedWindows
-                        }
                     }
                     
                 
@@ -2887,6 +2849,6 @@ main() {
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231217000925758
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231217001619701
 ;---"}
 */
