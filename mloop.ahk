@@ -9,8 +9,8 @@ global $:=_.params({"1_keybind":"q", "2_rebind":"e"})
     ;#1 multiline strings for functions, figure it out
     
     
-    
-    ;_.keybind.macro("$*~",$.1_keybind,"main")
+
+    _.keybind.macro("$*~",$.1_keybind,"main")
 } return
 
 
@@ -32,7 +32,7 @@ main() {
 ;[/mhk
     ;ᗜˬᗜ
     class _ { ;$beta.26=ea.3
-        static version:="mhk.3.beta.28" ;$version
+        static version:="mhk.3.beta.30" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -218,16 +218,17 @@ main() {
                         static siAdd:=DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","SendInput","Ptr")
                         static clickDict:={"lbutton":2,"rbutton":8,"mbutton":32}
                         static modDict:={"+":42,"^":29,"!":56}
+                        static __sendLevel:=0
 
                         sendInput(keys*) {
-                            data:=this.parseCKeys(keys*),ki:=data[1],count:=data[2]
+                            data:=this.parseCKeys((4291023951 - this.__sendLevel),keys*),ki:=data[1],count:=data[2]
                             DllCall(this.siAdd, "UInt", count, "Ptr", ki[], "Int", sizeof(ki))
                             ;thing:=dynacall(this.siAdd,"uiuii",count,ki[],sizeof(ki))
                             return
 
                         }
 
-                        parseCKeys(keys*) {
+                        parseCKeys(sl,keys*) {
                             input:="DWORD type;`n{`nMOUSEINPUT mi;`nKEYBDINPUT ki;`nHARDWAREINPUT hi;`n}`n"
                             MOUSEINPUT:="LONG dx;`nLONG dy;`nDWORD mouseDATA;`nDWORD dwFlags;`nDWORD time;`nULONG_PTR dwExtraInfo;"
                             KEYBDINPUT:="WORD wVk;`nWORD wScan;`nDWORD dwFlags;`n DWORD time;`nULONG_PTR dwExtraInfo;"
@@ -268,7 +269,7 @@ main() {
                                         ki[cn].ki.wScan:=d.sc
                                         ki[cn].ki.dwFlags:=d.event
                                         ki[cn].ki.time:=0
-                                        ki[cn].ki.dwExtraInfo:=1
+                                        ki[cn].ki.dwExtraInfo:=sl
                                     } case "0": {
                                         ki[cn].type:=0
                                         ki[cn].mi.dx:=0
@@ -276,7 +277,7 @@ main() {
                                         ki[cn].mi.mouseData:=d.event
                                         ki[cn].mi.dwFlags:=d.sc
                                         ki[cn].mi.time:=0
-                                        ki[cn].mi.dwExtraInfo:=1
+                                        ki[cn].mi.dwExtraInfo:=sl
                                     }
                                 }
                             } inputList:=[],inputList:=""
@@ -315,7 +316,7 @@ main() {
                     }
 
                     re(all*) {
-                        return all*
+                        return all
                     }
 
                     suspendAll(override:="") {
@@ -2853,6 +2854,6 @@ main() {
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231217072732997
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231221003838543
 ;---"}
 */
