@@ -2,14 +2,13 @@ _.start({"packageName":"mloop", "version":"1", "url":"https://raw.githubusercont
 global $:=_.params({"1_keybind":"q", "2_rebind":"e"})
 #if ((!winactive("ahk_exe code.exe")))
 {
-    ;! obsidian object types
-    ;! move documentation to obsidian
-    ;! actually write all the documentation lol
+    ;#1 obsidian object types
+    ;#2 actually write all the documentation lol
+    ;#3 Fix odd closing of scripts not dumping persistent data, ie. Running the script again (test if i can judt allow reloads through or some override stuff). 
     ;@ this version is held together by duct tape ᗜˬᗜ
-    ;#1 multiline strings for functions, figure it out
     
     
-
+    
     _.keybind.macro("$*~",$.1_keybind,"main")
 } return
 
@@ -31,8 +30,8 @@ main() {
 
 ;[/mhk
     ;ᗜˬᗜ
-    class _ { ;$beta.26=ea.3
-        static version:="mhk.3.beta.30" ;$version
+    class _ { ;$beta.31=ea.4
+        static version:="mhk.3.ea.5" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
             ;/tas
@@ -206,60 +205,56 @@ main() {
                 
                 ;/better send*
                     send(keys*) {
-                        return this.__send.sendInput(keys*)
+                        return this.__send.SendInput(keys*)
                     }
 
                     class __send extends _ {
                         static private
-                        static ptrs:=a_ptrsize
-                        static InputSize:=16+a_ptrsize*3
-                        static ptrEnd:=8+a_ptrsize*2
                         static minputList:={"options": "is", "pattern": "^(?:[+^!]|\w+|.|@$|#$)"}
-                        static siAdd:=DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","SendInput","Ptr")
+                        ;static u32SendInput:=dynacall(DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","SendInput","Ptr"),"uiuii")
+                        ;static inputStruct:=_.__send.__sendStruct()
                         static clickDict:={"lbutton":2,"rbutton":8,"mbutton":32}
                         static modDict:={"+":42,"^":29,"!":56}
-                        static __sendLevel:=0
+                        static __sendLevel:=4291023951
 
-                        sendInput(keys*) {
-                            data:=this.parseCKeys((4291023951 - this.__sendLevel),keys*),ki:=data[1],count:=data[2]
-                            DllCall(this.siAdd, "UInt", count, "Ptr", ki[], "Int", sizeof(ki))
-                            ;thing:=dynacall(this.siAdd,"uiuii",count,ki[],sizeof(ki))
+                        SendInput(keys*) {
+                            static u32SendInput:=dynacall(DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","SendInput","Ptr"),"uiuii")
+                            data:=this.parseCKeys(this.__sendStruct(),keys*),ki:=data[1],count:=data[2]
+                            u32SendInput[count,ki[],sizeof(ki)]
                             return
 
                         }
 
-                        parseCKeys(sl,keys*) {
-                            input:="DWORD type;`n{`nMOUSEINPUT mi;`nKEYBDINPUT ki;`nHARDWAREINPUT hi;`n}`n"
-                            MOUSEINPUT:="LONG dx;`nLONG dy;`nDWORD mouseDATA;`nDWORD dwFlags;`nDWORD time;`nULONG_PTR dwExtraInfo;"
-                            KEYBDINPUT:="WORD wVk;`nWORD wScan;`nDWORD dwFlags;`n DWORD time;`nULONG_PTR dwExtraInfo;"
-                            HARDWAREINPUT:="DWORD uMsg;`nWORD  wParamL;`nWORD  wParamH;",inputlist:=[],endList:=[],type:=1,c:=0
-                            ki:=Struct(input)
+                        parseCKeys(ki,keys*) {
+                            inputlist:=[],endList:=[],cn:=0
+                            modDict:=this.modDict, clickDict:=this.clickDict, minputList:=this.mInputList, sl:=this.__sendLevel
+                            ;ki:=this.__sendStruct()
                             for a,b in keys {
-                                crList:=base.mfilter(b,this.minputList),i:=0
+                                crList:=base.mfilter(b,minputList),i:=0,sc:=""
                                 loop {
-                                    first:=crList[1+i], modDiff:=this.modDict[first]
+                                    first:=crList[1+i], modDiff:=modDict[first]
                                     if (modDiff="")
                                         break
                                     inputList.push({"type":1,"sc":modDiff,"event":8})
                                     endList.push({"type":1,"sc":modDiff,"event":10})
-                                    i++
-                                } clickDiff:=this.clickDict[first]
-                                if (clickdiff="") {
-                                    sc:=getkeysc(first)
-                                } else {
-                                    sc:=clickDiff
-                                    type:=0
-                                } if (crList[2+i]="#") {
+                                    eLP:=1, i++
+                                } sc:=clickDict[first],type:=0
+                                if (sc="")
+                                    sc:=getkeysc(first),type:=1
+                                second:=crList[2+i]
+                                if (second="#") {
                                     inputList.push({"type":type,"sc":sc,"event":8},{"type":type,"sc":((type=0)?(sc*2):(sc)),"event":10})
                                 } else {
-                                    if (crList[2+i]="@") {
+                                    event:=8
+                                    if (second="@") {
                                         if (type=0)
                                             sc:=sc*2
                                         event:=10
-                                    } else {
-                                        event:=8
-                                    } inputList.push({"type":type,"sc":sc,"event":event})
-                                } inputList.push(endList*),endlist:=[],i:=0
+                                    }
+                                    inputList.push({"type":type,"sc":sc,"event":event})
+                                } if (elp=1)
+                                    inputList.push(endList*),endlist:=[],elp:=0
+                                i:=0
                             } for c,d in inputList {
                                 cn++
                                 switch type {
@@ -281,7 +276,27 @@ main() {
                                     }
                                 }
                             } inputList:=[],inputList:=""
-                            return [ki,c]
+                            return [ki,cn]
+                        }
+
+                        __sendStruct() {
+                            static ki
+                            if (ki)
+                                return ki
+                            input:="DWORD type;`n{`nMOUSEINPUT mi;`nKEYBDINPUT ki;`nHARDWAREINPUT hi;`n}`n"
+                            MOUSEINPUT:="LONG dx;`nLONG dy;`nDWORD mouseDATA;`nDWORD dwFlags;`nDWORD time;`nULONG_PTR dwExtraInfo;"
+                            KEYBDINPUT:="WORD wVk;`nWORD wScan;`nDWORD dwFlags;`n DWORD time;`nULONG_PTR dwExtraInfo;"
+                            HARDWAREINPUT:="DWORD uMsg;`nWORD  wParamL;`nWORD  wParamH;"
+                            ki:=Struct(input)
+                            return ki
+                        }
+
+                        _SendLevel[] {
+                            set {
+                                return this.__sendLevel:=4291023951 - value
+                            } get {
+                                return (4291023951-this.__sendLevel)
+                            }
                         }
 
 
@@ -570,16 +585,21 @@ main() {
                 
                 ;/bound func parser
                     funcLiteral(func2,args*) {
-                        path:=this.mfilter(func2,this.patterns.funcLiteralParse)
-                        for a,b in path
-                            path[a]:=this.filter(b,this.patterns.pathComment1,this.patterns.pathComment2)
-                        fnc:=path.pop()
-                        if ((path.count()=0)&&(isfunc(fnc))) {
-                            final:={},final.func:=(func(fnc).bind(args*)),final.path:=func2,final.args:=objbindmethod(this.__funcLiteral,"info",args)
-                            final.call:=this.__funcLiteral.call
-                            return final
-                        } temp:=path[1],currentObj:=(%temp%),path.removeat(1)
-                        for a,b in path {
+                        if (isobject(func2)) {
+                            path:=func2
+                            currentObj:=path[1],path.removeat(1),fnc:=path.pop()
+                        } else {
+                            path:=this.mfilter(func2,this.patterns.funcLiteralParse)
+                            for a,b in path
+                                path[a]:=this.filter(b,this.patterns.pathComment1,this.patterns.pathComment2)
+                            fnc:=path.pop()
+                            if ((path.count()=0)&&(isfunc(fnc))) {
+                                final:={},final.func:=(func(fnc).bind(args*)),final.path:=func2,final.args:=objbindmethod(this.__funcLiteral,"info",args)
+                                final.call:=this.__funcLiteral.call
+                                return final
+                            }
+                            temp:=path[1],currentObj:=(%temp%),path.removeat(1)
+                        } for a,b in path {
                             if (currentObj.haskey(b))
                                 currentObj:=currentObj[b]
                             else
@@ -2854,6 +2874,6 @@ main() {
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20231221003838543
+;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20240104114504117
 ;---"}
 */
