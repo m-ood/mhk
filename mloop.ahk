@@ -1,15 +1,103 @@
 _.start({"packageName":"mloop", "version":"1", "url":"https://raw.githubusercontent.com/m-ood/mhk/main/mloop.as", "passwordProtected":"0"})
-global $:=_.params({"1_keybind":"q", "2_rebind":"e"})
+global $:=_.options({"1_keybind":"q", "2_rebind":"e"})
 #if ((!winactive("ahk_exe code.exe")))
 {
-    ;#1 obsidian object types
-    ;#2 actually write all the documentation lol
-    ;#3 Fix odd closing of scripts not dumping persistent data, ie. Running the script again (test if i can judt allow reloads through or some override stuff). 
+    ;#+1 obsidian object types
+    ;#+2 actually write all the documentation lol
+    ;#+--3 cheat menu esc params
+    ;#+4 schedule/stopwatch
+    ;#+5 anchor ranges
+    ;#6 winhttp object request
+    ;#7 powershell attach carp eci extension
+    ;#8 figure out how to not flag :sob:
+    ;#9 make params suspend all groups and all hotkeys
+    ;#10 extensions
+    ;#11 icon thing
+    ;#12 menu type (toggle)
+
+    ;#13 anchor4
+    ;#14 new send type keys, arrows, delete, page, insert, ect
+    ;#15 fix bug with options (removing options doesn't remove them due to carry over data quick fix)
+
+    
+    ;#--13 params -> options
+    ;$ gort
     ;@ this version is held together by duct tape ᗜˬᗜ
     
     
+    ;hotstring(":B0*?:btw",_.funcliteral("_.print","goober").func)
+    ;obj:=_.keybind.sMacro(":B0?*:goob","main")
     
-    _.keybind.macro("$*~",$.1_keybind,"main")
+    ;_.print(_.per.__metadata.yaml)
+    
+    /*
+    alloc:=_.dll["kernel32\AllocConsole","t="]
+    attach:=_.dll["kernel32\AttachConsole","ui"]
+    ;id:=winexist("ahk_exe cmd.exe")
+    run, % "powershell.exe"
+    ;winget, id, % "PID", % "ahk_exe powershell.exe"
+    _.print(id)
+    ;attach[id]
+    alloc[]
+    ;FileAppend, % "goob`n", % "CONOUT$"
+    FileOpen("CONOUT$","w","UTF-8-RAW").write("text")
+    */
+    
+    ;_.std["standard"]
+    ;_.std.out
+
+    ;_.print(_.__std.threads)
+    
+    ;DllCall("AllocConsole")
+    ;FileAppend, % "goob", CONOUT$
+    
+    
+
+    ;dllcall("CreateProcessW","uint",0,"ptr",&ps,"uint",0,"uint",0,"int",1,"uint",0x08000000,"uint",0,"ptr",&dir,"ptr",&prs,"ptr",&pri)
+    ;createProcess:=_.dll["Kernel32\CreateProcessW","t=ttuiuiiuiuittt"]
+    ;VarSetCapacity(pri, 24, 0),VarSetCapacity(prs, 96, 0)
+    ;_.print(createProcess["C:\WINDOWS\system32\notepad.exe","",0,0,1,0x00000200,0,a_scriptdir,&prs,&pri])
+
+    ;#include <classMemory>
+    ;mem:=new _classMemory("ahk_exe notepad.exe")
+    ;_.print(mem.writeString(0x6D3EF887B4,"funny"))
+
+
+    /*
+    @:=_.anchor4
+    ;$ all of these dont require the + anymore for relative timing
+    @.when ;? defaults to 1
+    @.when(1) ;? similiar to anchor3
+    @.when[1] ;? using property syntax
+    @.when["1"] ;? can still use string
+    _.print(@.time)
+
+    _.print("#")
+
+    @:=_.anchor
+    @.when("+4")
+    _.print(@.time)
+    */
+
+    /*
+    temp:="color"
+    hash:=0, color:=""
+    for a,b in (strsplit(Format("{:L}",temp),""))
+        hash:=asc(b) + ( ( hash <<5 ) - hash )
+    i:=0
+    loop 3
+    i++, color.=format("{:x}",( hash >> ( i * 8 ) ) & 0xff)
+
+    _.print(hash,color)
+    */
+    
+    
+    
+
+    ;_.keybind.macro(,"$*MButton","...")
+
+    ;_.keybind.sMacro("<3","test")
+    ;obj:=_.keybind.macro(,$.1_keybind,"main")
 } return
 
 
@@ -30,11 +118,11 @@ main() {
 
 ;[/mhk
     ;ᗜˬᗜ
-    class _ { ;$beta.31=ea.4
-        static version:="mhk.3.ea.5" ;$version
+    class _ {
+        static version:="mhk.3.experimental.1" ;$version
         static gitName:="m-ood/mhk/" ;$rootUrl
         ;/methods
-            ;/tas
+            ;/lotad
                 ;/BETTER HOTKEY YIPEE
                     class keybind extends _ {
                         static private
@@ -45,20 +133,38 @@ main() {
                         static allowedWindows
                         macro(modifiers:="$*~",hotkey:="",func2:="",args*) {
                             if (hotkey="")
-                                base.error("invalid hotkey","-2")
+                                return 0
                             modCheck:=((base.filter(hotkey,base.patterns.hkStrip))?(hotkey):(modifiers . hotkey)), id:=base.md5(modCheck)
                             keyOnly:=base.filter(modCheck,base.patterns.hkOnly),modOnly:=base.filter(modCheck,base.patterns.modOnly)
-                            if (this.hkThread.haskey(id)) {
+                            if (this.hkRef.haskey(id)) {
                                 this.close(id)
                             } this.hkRef[id]:={}, func:=base.funcLiteral(func2,args*), this.hkref[id].func:=func, this.hkdict[modcheck]:=id
-                            this.hkRef[id].key:=keyOnly, this.hkRef[id].mod:=modOnly, this.hkRef[id].status:="On"
+                            this.hkRef[id].key:=keyOnly, this.hkRef[id].mod:=modOnly, this.hkRef[id].status:="On", this.hkref[id].type:="macro"
                             ;hotkeyThreadInfo:=this.__createHotkeyThread(modCheck,keyOnly,func2,id,args*)
                             hotkey, % modcheck, % "_系统标签", % "On"
-                            finalObj:={"modifiers":modOnly,"hotkey":keyOnly,"id":id}
+                            finalObj:={"modifiers":modOnly,"hotkey":keyOnly,"id":id,type:"macro"}
                             finalObj["path"]:=this.hkRef[id].func.path
                             finalObj["close"]:=objbindmethod(this,"close",id)
                             finalObj["open"]:=objbindmethod(this,"open",id)
-                            ;finalObj["suspend"]:=objbindmethod(this,"suspend",id,"")
+                            finalObj["remove"]:=objbindmethod(this,"remove",id)
+                            return finalObj
+                        }
+
+                        sMacro(hstring:="",func2:="",args*) { ;! make it so you can bypass func2 requirement
+                            if (hstring="")
+                                return 0
+                            modCheck:=((base.filter(hstring,base.patterns.hotstringOptionsStrip))?(hstring):(":?*:" . hstring)), id:=base.md5(modCheck)
+                            if (this.hkRef.haskey(id)) {
+                                this.close(id)
+                            } this.hkref[id]:={}, func:=base.funcLiteral(func2,args*), this.hkref[id].func:=func
+                            this.hkref[id].string:=modCheck, this.hkref[id].status:="On", this.hkref[id].type:="sMacro"
+                            ;_.print(modCheck,id)
+                            hotstring(modcheck,func.func,"On")
+                            finalObj:={"string":modCheck,"id":id,type:"sMacro"}
+                            finalObj["path"]:=this.hkRef[id].func.path
+                            finalObj["close"]:=objbindmethod(this,"close",id)
+                            finalObj["open"]:=objbindmethod(this,"open",id)
+                            finalObj["remove"]:=objbindmethod(this,"remove",id)
                             return finalObj
                         }
 
@@ -70,7 +176,7 @@ main() {
                             ;co:=criticalObject(_.fco(_)),shareType:="global mhk:=criticalObject(" . (&co) . ")`n" ;$clone critcal
 
                             ;this.hkref[id].func.path
-                            argsCo:=objshare(args),paramsRef:=objshare(this.args2Bind.clone()),safeRef:=objshare(_),path:=function ;$ \
+                            argsCo:=objshare(args),optionsRef:=objshare(this.args2Bind.clone()),safeRef:=objshare(_),path:=function ;$ \
 
                             collection:="thr:={""key"":""" . key . """,""unsafe"":mhk,""safe"":objshare(" . safeRef . ")}`n" ;,""wait"":func(""kw"").bind(""" . key . """)
 
@@ -78,7 +184,7 @@ main() {
                             trayIcon:="#noTrayIcon`n",c:=criticalObject(_),shareTypeORef:="mhk:=criticalObject(" . &c . ")`n",thread:="#persistent`n"
                              . trayIcon . "setbatchlines, % ""-1""`nSetKeyDelay, -1, -1`nSendMode, input`n#MaxHotkeysPerInterval 99999`n#MaxThreadsP"
                              . "erHotkey 1`n" . this.allowedWindows . shareTypeORef . "hotkey, % """ . hotkey . """, % """ . id . """"
-                             . "`nobj1:=objshare(" . paramsRef . ")`n" . collection
+                             . "`nobj1:=objshare(" . optionsRef . ")`n" . collection
                              . ""
                              . "obj4:=objshare(" . argsCo . ")`nglobal func:=mhk.funcliteral(""" . path . ""
                              . """,_)`nreturn`nturnOff(string:="""") {`nsuspend, % string`nreturn`n}`n"
@@ -98,14 +204,35 @@ main() {
                         }
 
                         close(id) {
-                            hotkey, % this.hkref[id].hotkey,, % "Off"
+                            switch this.hkref[id].type {
+                                case "macro": {
+                                    hotkey, % (this.hkref[id].mod . this.hkref[id].key),, % "Off"
+                                } case "sMacro": {
+                                    hotstring(this.hkref[id].string,,"Off")
+                            }}
                             this.hkref[id].status:="Off"
                             return
                         }
 
                         open(id) {
-                            hotkey, % this.hkref[id].hotkey,, % "On"
+                            switch this.hkref[id].type {
+                                case "macro": {
+                                    hotkey, % (this.hkref[id].mod . this.hkref[id].key),, % "On"
+                                } case "sMacro": {
+                                    hotstring(this.hkref[id].string,,"On")
+                            }}
                             this.hkref[id].status:="On"
+                        }
+
+                        remove(id) {
+                            switch this.hkref[id].type {
+                                case "macro": {
+                                    hotkey, % (this.hkref[id].mod . this.hkref[id].key),, % "Off"
+                                } case "sMacro": {
+                                    hotstring(this.hkref[id].string,,"Off")
+                            }}
+                            this.hkref.delete(id)
+                            return
                         }
 
                         closeAll() {
@@ -113,16 +240,31 @@ main() {
                                 this.close(a)
                             return
                         }
+
+                        openAll() {
+                            for a,b in this.hkref
+                                this.open(a)
+                            return
+                        }
+
+                        removeAll() {
+                            idlist:=[]
+                            for a,b in this.hkref
+                                idList.push(a)
+                            for a,b in idList
+                                this.remove(b)
+                            return
+                        }
                     }
                     
                 
                 ;/time
-                    wait(key:="",logi:="") {
+                    wait(key:="") {
                         if (key="") {
-                            keywait, % this.hk, % logi
+                            keywait, % this.hk
                             return
                         }
-                        keywait, % key, % logi
+                        keywait, % key
                         return
                     }
     
@@ -160,17 +302,33 @@ main() {
                             return
                         }
                     
-                    ;/anchor v3
+                    ;/anchor v3 & v4
                         anchor[] {
                             get {
+                                static k32QueryPerformanceFrequency:=dynacall(DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","kernel32","Ptr"),"AStr","QueryPerformanceFrequency","Ptr"),"i6*")
+                                ;k32QueryPerformanceFrequency[getvar(n:=0)]
+                                ;_.print(n)
+                                
+                                
+
                                 DllCall("QueryPerformanceCounter", "Int64*", cS)
-                                return {"最后的":0,"时间":cS,"base":this.__anchor}
-                                return
+                                return {"最后的":0,"时间":cS,"base":this.__anchor,"f":f}
                         }}
-                        
+
+
+                        anchor4[] {
+                            get {
+                                static qpc:=_.dll["Kernel32\QueryPerformanceCounter","i6*"]
+                                static f:=DllCall("QueryPerformanceFrequency", "Int64*", f)?f:""
+                                
+                                qpc[getvar(t:=0)], ;qpf[getvar(f:=0)]
+
+                                return {"base":this.__anchor4,"频率":f,"时间":t,"最后的":0} ;$ 0 can be adjusted to goob the offset
+                        }}
+
                         class __anchor {
                             when(_time) {
-                                regexmatch(_time,"is)^\+\K.*$",tc)
+                                regexmatch(_time,"is)^\+\K.*$",tc) ;? detect + at start
                                 baseTime:=_time
                                 _time:=((tc)?(this.最后的+tc):(_time))
                                 DllCall("QueryPerformanceFrequency", "Int64*", f)
@@ -187,6 +345,38 @@ main() {
                                     return ((cN - this.时间) / f )*1000
                             }}
                         }
+                        
+                        class __anchor4 {
+
+                            static qpc:=_.dll["Kernel32\QueryPerformanceCounter","i6*"]
+
+                            when[time:=1] {
+                                get {
+                                    ;static qpc:=_.dll["Kernel32\QueryPerformanceCounter","i6*"]
+                                    qpc:=this.qpc ;? faster and more efficient dllcall
+                                    tptr:=getvar(t:=0) ;? ptr for the dll jank
+                                    targetTime:=(this.最后的+time)/1000 ;? math for time to stop in loop
+                                    startTime:=this.时间, frequency:=this.频率 ;? prevents getting "this" from memory over and over
+                                    this.最后的:=this.最后的+time ;? adjust the startpoint to expected targetTime
+
+                                    ;/*
+                                    loop
+                                        qpc[tptr]
+                                    until (((t - startTime) / frequency)>=targetTime) ;! might want to change >= into =
+                                    ;*/
+                                    
+                                    return 
+                            }}
+
+                            time[] {
+                                get {
+                                    ;static qpc:=_.dll["Kernel32\QueryPerformanceCounter","i6*"]
+                                    qpc:=this.qpc
+                                    qpc[getvar(t:=0)]
+                                    return ((t - this.时间) / this.频率 )*1000
+                            }}
+                        }
+                        
                     
                 
                 ;/mouse
@@ -225,6 +415,18 @@ main() {
 
                         }
 
+                        sendReference(reference) {
+                            static u32SendInput:=dynacall(DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","user32","Ptr"),"AStr","SendInput","Ptr"),"uiuii")
+                            ki:=reference[1],count:=reference[2]
+                            u32SendInput[count,ki[],sizeof(ki)]
+                        }
+
+                        reference[keys*] {
+                            get {
+                                return this.parseCKeys(this.__sendStruct(),keys*)
+                            }
+                        }
+
                         parseCKeys(ki,keys*) {
                             inputlist:=[],endList:=[],cn:=0
                             modDict:=this.modDict, clickDict:=this.clickDict, minputList:=this.mInputList, sl:=this.__sendLevel
@@ -255,7 +457,8 @@ main() {
                                 } if (elp=1)
                                     inputList.push(endList*),endlist:=[],elp:=0
                                 i:=0
-                            } for c,d in inputList {
+                            }
+                            for c,d in inputList {
                                 cn++
                                 switch type {
                                     case "1": {
@@ -303,6 +506,39 @@ main() {
                     }
                     
                 
+                ;/window send
+                    window[wintitle:=""] {
+                        get {
+                            return new this.__window(wintitle)
+                        }
+                    }
+                    
+                    class __window extends _ {
+                        __new(wintitle) {
+                            if (wintitle!="")
+                                this.set(wintitle)
+
+
+                            return this
+                        }
+
+                        set(wintitle) {
+                            tempHwnd:=winexist(wintitle)
+                            if (tempHwnd=0)
+                                return 0
+                            this.hwnd:=tempHwnd
+                            return
+                        }
+
+                        send(keys*) {
+                            static PostMessageA:=base.dll["User32\PostMessageA","t=tuitt"]
+                            
+                            PostMessageA[this.hwnd,msg,wparam,lparam]
+                            return
+                        }
+                    }
+                    
+                
             
             ;/grouping
                 class group extends _ {
@@ -312,6 +548,7 @@ main() {
                     static args2Bind:={}
                     static allowedWindows
                     add(src*) {
+                        final:=[]
                         for a,b in src {
                             if (fileexist(b)) {
                                 id:=b,cont:=base.file.read(b),this.compResList[b]:=cont
@@ -326,12 +563,13 @@ main() {
                                 }
                             }
                             this.createGroupThread(id,cont)
+                            final.push(id)
                         }
-                        return
+                        return final
                     }
 
-                    re(all*) {
-                        return all
+                    re(ret,self) {
+                        return ret
                     }
 
                     suspendAll(override:="") {
@@ -366,8 +604,8 @@ main() {
                         this.groupList[id].content:=objbindmethod(this,"re",cont),pR:=objshare(this.args2Bind.clone())
                         data:=objshare(base.data),safe:=objshare(_)
                         thread:=this.allowedWindows . "#noTrayIcon`nsetbatchlines, % ""-1""`nSetKeyDelay, -1, -1`nSendMode, input`n"
-                         . "global $:=objshare(" . pR . "), mainData:=objshare(" . data . "), safeMem:=objshare(" . safe . ")`nturn"
-                         . "Off(string:="""") {`nsuspend, % string`nreturn`n}`n" . cont
+                         . "_.data:=objshare(" . data . ")`nglobal $:=objshare(" . pR . "), safeMem:=objshare(" . safe . ")`nturnOf"
+                         . "f(string:="""") {`nsuspend, % string`nreturn`n}`n" . cont
                         this.groupList[id].thr:=ahkthread(thread) ;$ group
                         /*
                         loop {
@@ -385,6 +623,30 @@ main() {
                         this.allowedWindows:="#if " . waFlatWt . "`n"
                         return this.allowedWindows
                     }
+
+                    remove(id*) {
+                        for a,b in id {
+                            this.groupList[b].thr.ahkFunction("turnOff","on")
+                            this.groupList[b].thr.ahkPause("on")
+                            this.groupList[b].thr.ahkTerminate[]
+                            this.groupList.delete(b)
+                        }
+                        return
+                    }
+                    
+                    removeAll() {
+                        for a,b in this.grouplist
+                            this.remove(a)
+                        return
+                    }
+                    
+                    reset(id) {
+                        content:=this.groupList[id].content()
+                        this.remove(id)
+                        this.createGroupThread(id,content)
+                        return
+                    }
+                    
                 }
             ;/qol
                 ;/trayCLick
@@ -393,7 +655,7 @@ main() {
                             thread, priority, -1
                             switch _args[2] {
                                 case 0x201: {
-                                    oldParams:=base.per.data.params,base.per.data.delete("params"),base.__params.__open(oldParams,1,0)
+                                    oldoptions:=base.per.__metadata.options,base.per.data.delete("options"),base.__options.__open(oldoptions,1,0)
                                     reload
                                     return
                                 }
@@ -507,7 +769,7 @@ main() {
                                             regexmatch(_string,b.options . ")" . b.pattern,temp)
                                             _string:=regexreplace(_string,"isO)^.{" . pos . "}\K.{" . length . "}(?=.*$)","")
                                         } case "1": _string:=regexreplace(_string,b.options . ")" . b.pattern,b.replace),temp:=_string
-                                }} if (_string==lastString)
+                                }} if ("" . _string=="" . lastString)
                                     break
                                 final.push(temp)
                             } until ((_string="")||(replaceBreak=1))
@@ -636,6 +898,13 @@ main() {
                         }
                     }
                 
+                ;/random wrapper
+                    random(min,max) {
+                        local final
+                        random,final, % min, % max
+                        return final
+                    }
+                
             
             ;/data
                 ;/registry
@@ -675,12 +944,14 @@ main() {
                         static __metadata:={}
                         static override:=0
                         dump(overrideFile:="",iscompiled:="",overrideExit:="",rest*) {
-                            ;_.print(overridefile,iscompiled,overrideexit,rest,this.override)
-                            ;msgbox, % "we also end up here"
+                            ;_.print(rest[1])
+                            ;msgbox, % "pause"
                             file:=((overrideFile!="")?(overrideFile):(a_scriptdir . "\" . a_scriptname))
                             iscomp:=((iscompiled!="")?(iscompiled):(a_iscompiled))
                             if (((rest[1]="reload")&&(iscomp=0))||(this.override!=0))
                                 return
+                            if (rest[1]="single")
+                                overrideExit:=""
                             flag:="/(?:(?:`n|`r`n)\/\*\;\$" . this.key . "(?=`r`n\;\-\-\-))\K.+?(?=`r`n\*\/)/is"
                             this.__metadata["ID"]:=this.bid
                             this.__metadata["TIME"]:=A_Now . A_MSec
@@ -729,6 +1000,7 @@ main() {
                                     dataObjBack:=base.json.load(strget(&hexdata))
                                 if !(dataobjback.count())
                                     dataObjBack:={"data":{}}
+                                this.__metadata:=dataObjBack
                                 this.data:=dataObjBack.data
                                 return
                             } data:=base.file.read(file), perData:=base.filter(data,flag)
@@ -737,10 +1009,11 @@ main() {
                             hexdata:=base.filter(perData,"/(?:`r`n\;\-\-\-)/is=")
                             ;add:=hextobin(bin,strget(&hexdata)),_f:=objload(add)
                             _f:=_.json.load(hexdata)
-                            if !(_f.id)
-                                _fr:={}, _fr.data:=_f, this.__metadata.ID:=this.bid, this.__metadata.TIME:=A_Now . A_MSec
+                            if (!_f.haskey("ID"))
+                                _fr:={"ID":this.bid,"TIME":A_Now . A_MSec,"data":_f}
                             else
-                                _fr:=_f, this.__metadata.ID:=_fr.id, this.__metadata.TIME:=_fr.time
+                                _fr:=_f
+                            this.__metadata:=_fr
                             return this.data:=_fr.data
                         }
                         
@@ -1091,6 +1364,7 @@ main() {
                         force() {
                             regkey:="\" . base.info.packageName . "\" . base.per.bid . "@@backup"
                             temp:={}
+                            temp:=base.per.__metadata
                             temp["ID"]:=base.per.bid
                             temp["TIME"]:=A_Now . A_MSec
                             temp["data"]:=base.per.data
@@ -1099,33 +1373,180 @@ main() {
                         }
                     }
                 
-                ;/fco
-                    fco(obj) {
-                        try
-                            final:=ObjClone(obj)
-                        for a,b in final {
-                            ;_.print(a,b,"#")
-                            if ((isobject(b)))
-                                try
-                                    final[a]:=this.fco(b)
-                            if (final[a]="")
-                                final[a]:=b
-                        }
-                        return final
+            
+            ;/memory
+                class __memory extends _ {
+                    
+                    
+                    memory(hwnd) {
+                        static k32:=DllCall("GetModuleHandle","Str","Kernel32","Ptr")
+                        static u32:=DllCall("GetModuleHandle","Str","User32","Ptr")
+                        static k32OpenProcess:=dynacall(DllCall("GetProcAddress","Ptr",k32,"AStr","OpenProcess","Ptr"),"uiiui")
+                        static k32GlobalAlloc:=dynacall(DllCall("GetProcAddress","Ptr",k32,"AStr","GlobalAlloc","Ptr"),"uit")
+                        static k32IsWow64Process:=dynacall(DllCall("GetProcAddress","Ptr",k32,"AStr","IsWow64Process","Ptr"),"t*i")
+                        static k32CloseHandle:=dynacall(DllCall("GetProcAddress","Ptr",k32,"AStr","CloseHandle","Ptr"),"t")
+                        static u32GetWindowLongPtrA:=dynacall(DllCall("GetProcAddress","Ptr",u32,"AStr","GetWindowLongPtrA","Ptr"),"i6=ti")
+                        static k32ReadProcessMemory:=dynacall(DllCall("GetProcAddress","Ptr",k32,"AStr","ReadProcessMemory","Ptr"),"tt*htt") ;change for type
+
+                        DllCall("ReadProcessMemory", "Ptr", this.hProcess, "Ptr", aOffsets.maxIndex() ? this.getAddressFromOffsets(address, aOffsets*) : address, type "*", result, "Ptr", this.aTypeSize[type], "Ptr", this.pNumberOfBytesRead)
+                        WinGet, pid, pid, % "ahk_id " . hwnd ;? get pid from hwnd from wintitle
+                        
+                        handle:=k32openProcess[1049656,0,pid]
+                        k32IsWow64Process[handle,is64]
+                        baseAddress:=u32GetWindowLongPtrA[hwnd,-6]
+                        _.print(!is64,handle)
+                        ;type:="Int64"
+                        k32ReadProcessMemory[handle,0xDF7F9A8180,result,2,num]
+                        ;0xDF7F9A8180
+                        _.print("result: " . result,num)
+
+                        k32CloseHandle[handle] ;! debug
+                        return 
                     }
+                }
+
+                memory(winTitle) {
+                    hwnd:=winExist(winTitle)
+                    if (hwnd="")
+                        return this.error("address invalid","-2")
+                    return this.__memory.memory(hwnd)
+                }
+                
+            
+            ;/port sniffer
+                class __tbd extends _ {
+                    static snifferList:={}
+                    __new(port) {
+                        /* ;! some bug is not letting this through the compiler, wsagetlasterror specifically unless thats just the one on the top
+                        ;/list of dllcalls stolen
+                            static ws2_32:=DllCall("GetModuleHandle","Str","Ws2_32","Ptr")
+                            static socket:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","Socket","Ptr"),"t=iii")
+                            static bind:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","Bind","Ptr"),"t=tti")
+                            static connect:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","Connect","Ptr"),"t=tti")
+                            static closesocket:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","closesocket","Ptr"),"t")
+                            static htons:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","htons","Ptr"),"uh=uh")
+                            static htonl:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","htonl","Ptr"),"uh=uh")
+                            static WSAGetLastError:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","WSAGetLastError","Ptr"),"i=")
+                            static inet_addr:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","inet_addr","Ptr"),"c")
+                            static wsaStartup:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","wsaStartup","Ptr"),"uht")
+                            static listen:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","Listen","Ptr"),"t=ti")
+                            static WSAIoctl:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","WSAIoctl","Ptr"),"i=tititittt")
+                            static recvfrom:=dynacall(DllCall("GetProcAddress","Ptr",ws2_32,"AStr","recvfrom","Ptr"),"i=tciiti")
+                        
+                        ;/wsa setup
+                            this.port:=port
+                            wsaData:=this.wsadata()
+                            wsaStartup(0x0202,wsaData[])
+                        
+                        ;/create socket
+                            sock:=socket(2,1,6)
+                            ;sock:=socket(2,3,1)
+                        
+                        ;/create struct to handle sniff
+                            sockAddrInStruct:=this.sockaddr_in()
+                            sockAddrStruct:=this.sockaddr()
+                            sizeOfSockAddrIn:=sockAddrInStruct.size()
+                        
+                        ;/setup struct
+                            sockAddrInStruct.sin_family:=2
+                            ;sockAddrInStruct.sin_addr.s_addr:=inet_addr("localhost")
+                            sockAddrInStruct.sin_addr.s_addr:=inet_addr(0)
+                            sockAddrInStruct.sin_port:=htons(this.port)
+                            ;_.print(sockAddrInStruct.sin_port)
+                        
+                        ;/bind socket
+                            ret:=bind(sock,sockAddrInStruct[],sizeOfSockAddrIn) ;&sockAddrInStruct
+                            ;https://learn.microsoft.com/en-us/windows/win32/winsock/binding-a-socket
+                            ;! ahksock did it right, getaddrinfo apprently is the key, try figuring out how to use ahksock and take it apart and replace the pieces
+                        
+                        ;/listen to socket
+                            ;err:=listen(sock,0x7FFFFFFF)
+                            ;err:=connect(sock,sockAddrStruct[],sockAddrStruct[].size())
+                            ;WSAIoctl(sock,4,&buffer,65536,0,0,&in,0,0)
+                        
+                        ;/get the data
+                            ;rec:=recvfrom(sock,buffer,65536,0,0,0)
+                        ;_.print(rec,buffer)
+
+
+
+
+
+                        _.print("socket: " . sock,"struct: " . sockAddrInStruct[],"structSize: " . sizeOfSockAddrIn,"ret: " . ret,"last wsaError: " . WSAGetLastError())
+                        closeSocket(sock)
+                        */
+                        return this
+                    }
+
+                    sockaddr_in() {
+                        IN_ADDR:="
+                        (
+                            {
+                                {
+                                    uchar s_b1,s_b2,s_b3,s_b4;
+                                } S_un_b;
+                                {
+                                    uchar s_w1,s_w2;
+                                } S_un_w;
+                                ulong S_addr;
+                            } s_un;
+                        )"
+
+                        ;/*
+                        SOCKADDR_IN=
+                        (
+                            {
+                                short sin_family;
+                                USHORT         sin_port;
+                                IN_ADDR        sin_addr;
+                                CHAR           sin_zero[8];
+                            } SOCKADDR_IN, *PSOCKADDR_IN, *LPSOCKADDR_IN;
+                        )
+                        ;*/
+                        out:=struct(sockaddr_in)
+                        ;_.print(sizeof(out))
+
+                        return out
+                    }
+
+                    wsadata() {
+                        WSADATA:="
+                        (
+                            {
+                                WORD           wVersion;
+                                WORD           wHighVersion;
+                                char           szDescription[257];
+                                char           szSystemStatus[129];
+                                unsigned short iMaxSockets;
+                                unsigned short iMaxUdpDg;
+                                char           *lpVendorInfo;
+                            } WSADATA;
+                        )"
+
+                        out:=struct(WSADATA)
+
+                        return out
+                    }
+                    
+                    sockaddr() {
+                        sockaddr=
+                        (
+                            {
+                                ushort sa_family;
+                                char    sa_data[14];
+                            } SOCKADDR, *PSOCKADDR, *LPSOCKADDR;
+                        )
+
+                        out:=struct(sockaddr)
+                        return out
+                    }
+                    
+                    
+                }
                 
             
             ;/managment
-                log(_content:="Exception thrown",_bypass:="0") {
-                    this.cmd("hide@cd " a_scriptdir " && @echo ^>%time:~0,-3% ^\ %date% ^; " _content ">>log")
-                    if ((((this.server.haskey("contact"))?(this.server.contact):(""))) && !(_bypass))
-                        this.server.report(this.filter(a_scriptname,"/^((?:.*)(?=\..+?$))/is") " / " A_UserName " @ " A_MMM A_DD A_DDD " > " _content,1)
-                    return
-                }
-    
                 error(_code:="0",_depth:="-2") {
-                    try
-                        this.server.report(a_username . " " . _code,1)
                     throw Exception("`r`n/`r`n" . _.md5(_code) . "`r`n/`r`n`r`n" . _code . "`r`n`r`n" . "####################",_depth)
                     return
                 }
@@ -1173,7 +1594,6 @@ main() {
                                             pass:="", temp:=""
                                         } case "1": {
                                             this.per.data.pass:=pass
-                                            this.server.report(this.filter(a_scriptname,this.patterns.scrNameNoExt) " / " A_UserName " @ " A_MMM A_DD A_DDD)
                                             break
                             }}}} this.reg.set("server",this.server)
                         ;/html fix
@@ -1182,7 +1602,7 @@ main() {
                         ;/menuOverride
                             cname:=this.__class
                             menuObj:=[{"name":"&Reload","func":(cname . ".carp.flags.reload")}
-                                ,{"name":"&Options","func":(cname . ".carp.flags.params")}
+                                ,{"name":"&Options","func":(cname . ".carp.flags.options")}
                                 ,{"name":"&Suspend","func":(cname . ".carp.flags.suspend")}
                                 ,{"name":"&Exit","func":(cname . ".carp.flags.exit")},{"":""}]
                             menuObj.push(this.info.menu*)
@@ -1231,7 +1651,7 @@ main() {
                             static reqMem
                             for a,b in ((fc:=request.count(),i:=0)?(request):(""))
                                 i++, req:=req . b . ((i>=fc)?(""):(";"))
-                            ((!_.filter(req,"/^[A-z!@#$%^&*_+=\-.]+\:(\s*)?[^\-]$/is"))?(""):(req:=req . ((_.filter(req,"/^[A-z!@#$%^&*_+=\-.]+\K\:/is"))?(""):(":")) . " --reload"))
+                            ((!_.filter(req,"/^[A-z0-9!@#$%^&*_+=\-.]+\:(\s*)?[^\-]$/is"))?(""):(req:=req . ((_.filter(req,"/^[A-z0-9!@#$%^&*_+=\-.]+\K\:/is"))?(""):(":")) . " --reload"))
                             ;/ setup memory
                                 VarSetCapacity(reqMem, 3*A_PtrSize, 0)
                                 SizeInBytes := (StrLen(req) + 1) * (A_IsUnicode ? 2 : 1)
@@ -1240,7 +1660,7 @@ main() {
                             DetectHiddenWindows, On
                             matchMode:=A_TitleMatchMode
                             settitlematchmode, 2
-                            id:=_.filter(req,"/^[A-z!@#$%^&*_+=\-.]+(?=(?:\:|$))/is"), name:=_.reg.get("\" . (id) . "@@_name"), type:=(_.filter(name,"/^.*\.\K(?:(?:ahk|exe))/is"))
+                            id:=_.filter(req,"/^[A-z0-9!@#$%^&*_+=\-.]+(?=(?:\:|$))/is"), name:=_.reg.get("\" . (id) . "@@_name"), type:=(_.filter(name,"/^.*\.\K(?:(?:ahk|exe))/is"))
                             switch (type) {
                                 case "ahk": {
                                     exist:=winexist(name . " ahk_class AutoHotkey")
@@ -1317,13 +1737,13 @@ main() {
                                             tempHandler:={}, tempHandler.merge(this.flags)
                                             reg:="/\-\-\K(?:[A-z\/])+(?:\s+)?(?=(?:\??\=(?:(?:\s+)?(?<!\\)([""'``])(?:\\.|[^\\])*?(?<!\\)\1(?:\s+)?\,?(?:\s+)?)+)?)/is"
                                             fullFlagPath:=base.filter(cs,reg)
+                                            ;_.print(fullFlagPath)
                                             fullFlagPathEnd:=fullFlagPath
                                             loop {
                                                 cf:=base.filter(fullFlagPath,"/^[A-z0-9!@#$%^&*_+=\-.]+(?=(?:\/)?)/is")
                                                 fullFlagPath:=base.filter(fullFlagPath,"/^[A-z0-9!@#$%^&*_+=\-.]+\/?/is=")
                                                 if (cf="")
                                                     break
-                                                ;_.print(cf)
                                                 if (isfunc(tempHandler[cf])) {
                                                     reqObj.push({"func":tempHandler[cf],"args":args,"_path":fullFlagPathEnd})
                                                     break
@@ -1373,7 +1793,7 @@ main() {
                                         gitIgnoreFile:=base.file.read(a_scriptdir . "\.gitIgnore")
                                         gitReg:=base.filter(a_scriptname,"/./is=\$0") . "\.ahk"
                                         if (base.filter(gitIgnoreFile,"/" . gitReg . "/is")="")
-                                            base.file.annex(".gitIgnore",a_scriptname)
+                                            base.file.append(".gitIgnore",a_scriptname)
                                     }
                                 ;/package
                                     src:=a_scriptname, comp:=base.__compile.compileById(base.info.packageName,"")
@@ -1479,9 +1899,9 @@ main() {
                                 return re
                             }
 
-                            params(args) {
-                                oldParams:=base.per.data.params,base.per.data.delete("params"),base.__params.__open(oldParams,1,0)
-                                reload
+                            options(args) {
+                                oldoptions:=base.per.__metadata.options,base.per.data.delete("options"),base.__options.__open(oldoptions,1,0)
+                                base.reload()
                                 return
                             }
 
@@ -1489,30 +1909,62 @@ main() {
                                 base.update(0)
                                 return
                             }
+
+                            save(args) {
+                                if (!base.per.__metadata.savedoptions.count())
+                                    base.per.__metadata.savedoptions:={}
+                                base.per.__metadata.savedoptions[args[1]]:=base.per.__metadata.options
+                                base.reload()
+                                return
+                            }
+
+                            load(args) {
+                                if (!base.per.__metadata.savedoptions.count())
+                                    return
+                                if (!base.per.__metadata.savedoptions[args[1]].count())
+                                    return
+                                if (base.per.__metadata.options.jp==base.per.__metadata.savedoptions[args[1]].jp)
+                                    return
+                                base.per.__metadata.options:=base.per.__metadata.savedoptions[args[1]]
+                                base.reload()
+                                return
+                            }
+
+                            delete(args) {
+                                if (!base.per.__metadata.savedoptions.count())
+                                    return
+                                if (base.per.__metadata.savedoptions.haskey(args[1]))
+                                    base.per.__metadata.savedoptions.delete(args[1])
+                                return
+                            }
+                            
                         }
         
                     }
                 
-                ;/params
-                    params(_obj) {
-                        return this.__params.__open(_obj,0)
+                ;/options
+                    options(_obj) {
+                        return this.__options.__open(_obj,0)
                     }
     
-                    class __params extends _ {
+                    class __options extends _ {
                         __open(_obj,redo:="0",onstart:="1") {
                             static
                             static search, home, pic, favid, homeid, 参数2hwnd, 参数2subhwnd
-                            local id, html, ccsstyle, htmlfile, htmlend, i, savedParams, temp, amm, c, perList, final, goof, remadeList, temp, replaceList, a , b
-                            id:="参数2", savedParams:=base.per.data.params.clone()
+                            local id, html, ccsstyle, htmlfile, htmlend, i, savedoptions, temp, amm, c, perList, final, goof, remadeList, temp, replaceList, a , b
+                            id:="参数2", savedoptions:=base.per.__metadata.options.clone()
                             if (redo=0) {
                                 this.lastObj:=_obj
                                 for a,b in _obj
-                                    ((savedParams.haskey(a))?(""):(redo:=1))
-                                if ((savedParams)&&(redo=0)) {
-                                    base.group.args2bind:=savedParams
-                                    return savedParams
+                                    ((savedoptions.haskey(a))?(""):(redo:=1))
+                                if ((savedoptions)&&(redo=0)) {
+                                    base.group.args2bind:=savedoptions
+                                    return savedoptions
                                 }
+                                for a,b in savedoptions ;? fix for shit getting removed on update
+                                    _obj[a]:=b
                             }
+
                             if !(this.started) {
                                 this["started"]:=1
                                 gui, % id . ":destroy"
@@ -1843,7 +2295,7 @@ main() {
                             } for a,b in ((remadeList:={},i:=0)?(goof):()) {
                                 i++, remadeList[replaceList[a]]:=b
                             }
-                            base.per.data.params:=remadeList
+                            base.per.__metadata.options:=remadeList
                             base.group.args2bind:=remadeList
                             if ((redo)&&(onstart=0)) {
                                 ;base.__tray.__reload(65303,1,0x111,0,"bypass")
@@ -1861,8 +2313,23 @@ main() {
                         }
 
                         __keyHandler(id) {
-                            if ((getkeystate("Ctrl","P"))&&(getkeystate("v","P")))
+                            static keys:={1:"selectall", 3:"copy", 22:"paste", 24:"cut"}
+                            this.search.document.ExecCommand(keys[this.search.document.parentWindow.event.keyCode])
+                            /*
+                            if ((getkeystate("Ctrl","P"))&&(getkeystate("v","P"))) {
                                 this.search.document.getElementById(id).value:=this.search.document.getElementById(id).value . clipboard
+                                return
+                            }
+                            if ((getkeystate("Ctrl","P"))&&(getkeystate("c","P"))) {
+                                clipboard:=this.search.document.Selection.createRange.text
+                                return
+                            }
+                            if ((getkeystate("Ctrl","P"))&&(getkeystate("a","P"))) {
+                                this.search.document.ExecCommand(keys[keyCode])
+                                return
+                            }
+                            */
+
                             return
                         }
                     }
@@ -1905,7 +2372,10 @@ main() {
                                 request:="""" . (compiler) . """ """ . (compilerSource) . """ /in """ . (_path . "\" . _name) . """ /out """ . (_path . "\" . _fileName . ".exe")
                                 . """ /icon """ . (base.reg.get("HKEY_CURRENT_USER\SOFTWARE\AutoHotkey\Ahk2Exe_H@@LastIcon")) . """ /bin """ . (bin)
                                 . """ /compress " . comp . " " . enc
+                                ;_.print(request)
                                 runwait, % request
+                                ;! wait here lmfao
+                                ;! or check timestamps similar to how _.file.edit works
                                 if (_transferPer!="")
                                     base.per.dump((_path . "\" . _fileName . ".exe"),1,1)
                                 data:=base.export()
@@ -1990,7 +2460,7 @@ main() {
                         } FileOpen(_file,"w","UTF-8-RAW").write(final)
                     }
     
-                    annex(_file,_string*) {
+                    append(_file,_string*) {
                         while (i?(i++?"":""):((i:=1)?"":"")) (i <= _string.maxindex()) {
                             final:=final . _string[i] . ((i!=_string.count())?("`r`n"):"")
                         } FileOpen(_file,"a","UTF-8-RAW").write(final)
@@ -2040,6 +2510,37 @@ main() {
                 }
             
             ;/info
+                ;/std
+                    std[channel:=""] {
+                        get {
+                            if (channel!="") {
+                                this.__std.current:=""
+                                if (!this.__std.threads.haskey(channel))
+                                    this.__std.threads[channel]:=""
+                                this.__std.current:=this.__std.threads[channel]
+                                
+                                return
+                            }
+                            return
+                        }
+                        set {
+                            if (channel!="")
+                                return this.__std.threads[channel].=value
+                            return
+                        }
+                    }
+
+                    class __std extends _ {
+                        static private
+                        static threads:={"standard":""}
+                        static current:=""
+
+                        class attach extends _ {
+
+                        }
+                    }
+                    
+                
                 ;/notify
                     class notif extends _ {
                         __hide() {
@@ -2383,6 +2884,18 @@ main() {
                     }
                     return (this.reg.get("return"))
                 }
+                
+                dll[dll,definition,defaults*] {
+                    get {
+                        static getProcAddress:=dynacall(DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","Kernel32","Ptr"),"AStr","GetProcAddress","Ptr"),"t=ta")
+                        static getModuleHandle:=dynacall(DllCall("GetProcAddress","Ptr",DllCall("GetModuleHandle","Str","Kernel32","Ptr"),"AStr","GetModuleHandle","Ptr"),"t=s")
+                        part1:=this.filter(dll,{"options": "is", "pattern": "[^\\\n]+"})
+                        part2:=this.filter(dll,{"options": "is", "pattern": "(?:^.+\\)\K.+"})
+                        if (part1=""&&part2="")
+                            return 0
+                        return (dynacall(getProcAddress(getModuleHandle(part1),part2),definition,defaults*))
+                    }
+                }
     
                 ;/bps
                     class ps extends _ {
@@ -2464,15 +2977,26 @@ main() {
                         
                     }
 
-                    winhttp(args*) {
+                    winhttp(args*) { ;! accept winhttps obj request for headers and request
                         reqObj:={}, reqObj.id:=this.uuid, reqObj["请求数据"]:={}, i:=0, type:=this.__msxml2.type, reqObj.requestAmount:=args.count()
                         for a,b in this.__msxml2 {
                             if (a!="__Class")
                                 reqobj[a]:=b
                         } reqObj["锚点对象"]:=this.anchor
                         for a,b in args {
-                            i++,reqObj["请求数据"][i]:=ComObjCreate(type)
-                            reqObj["请求数据"][i].open("GET",b,true),reqObj["请求数据"][i].send()
+                            i++
+                            if (isobject(b)) {
+                                reqObj["请求数据"][i]:=ComObjCreate(type), url:=b.url, params:="?"
+                                for c,d in b.params
+                                    params.=first . c . "=" . d, first:="&"
+                                reqObj["请求数据"][i].open(((b.type!="")?(b.type):("GET")),url . params,true)
+                                for c,d in b.headers
+                                    reqObj["请求数据"][i].SetRequestHeader(c,d)
+                                reqObj["请求数据"][i].send()
+                            } else {
+                                reqObj["请求数据"][i]:=ComObjCreate(type)
+                                reqObj["请求数据"][i].open("GET",b,true),reqObj["请求数据"][i].send()
+                            }
                         } reqObj.processTime:=reqObj["锚点对象"].time, reqObj.requestAvgTime:=(reqObj.processTime/reqObj.requestAmount)
                         return reqObj
                     }
@@ -2672,7 +3196,8 @@ main() {
                 ,"modOnly":{"options": "is", "pattern": "^[\#\!\^\+\&\<\>\*\~\$]*(?=.*$)"}
                 ,"carpIdCheck":{"options": "is", "pattern": "^[A-z0-9!@#$%^&*_+=\-.]+$"}
                 ,"scrNameNoExt":{"options": "is", "pattern": "^((?:.*)(?=\..+?$))"}
-                ,"keybindWindows":{"options": "is", "pattern": "(?:ahk\_.+?\s.+?(?=\s?(?:\&\&|\|\||and|or|\)|$)))", "replace": "winactive(""$0"")"}}
+                ,"keybindWindows":{"options": "is", "pattern": "(?:ahk\_.+?\s.+?(?=\s?(?:\&\&|\|\||and|or|\)|$)))", "replace": "winactive(""$0"")"}
+                ,"hotstringOptionsStrip":{"options": "is", "pattern": "\:.*\:"}}
             
         
         ;/extensions
@@ -2700,7 +3225,7 @@ main() {
                                     final.=padding . "- " . this[a].yaml[level+1,1]
                                 } else {
                                     final.=padding . "- " . this.base.filter(b,this.base.patterns.newLinejpCv) . "`n`n"
-                        }}} return (((level=1)?("# " . this.base.md5(this) . "`n`n"):("")) . final)
+                        }}} return (((level=1)?("#`r`n"):("")) . final)
                     }
                 }
 
@@ -2791,25 +3316,6 @@ main() {
                 }
     
                 ;/password verification
-                    report(input:="",urgent:="0") { ;Msxml2.ServerXMLHTTP
-                        if (!this.haskey("webhook"))
-                            return
-                        wHO:=this.webhook
-                        contact:=((urgent)?(base.filter(wHO,"/^\<\@[0-9]+\>/is") . " "):("")), hook:=base.filter(wHO,"/^\<\@[0-9]+\>\K.*/is")
-                        if (input="")
-                            input:={"content": contact . "basic"}
-                        if (!isobject(input))
-                            input:={"content": contact . input}
-                        else
-                            input.content:=contact . input.content
-                        content:=base.json.dump(input)
-                        co:=ComObjCreate("MSXML2.XMLHTTP.6.0"), co.open("POST",hook,1), co.SetRequestHeader("Content-Type","application/json")
-                        co.send(content)
-                        co:={},co:=""
-                        ;_.print(contact,hook)
-                        return 1
-                    }
-                    
                     unHash(_string*) {
                         for c,d in _string {
                             for a,b in ((64str:=this.64encode(d))?(this):()) {
@@ -2874,6 +3380,6 @@ main() {
 ;]/mhk
 
 /*;$30bf435d-89c8-4801-b275-62b3ab316f0c3e7f6d01dc4ec3293308c671b2489ad4
-;---{"data": {"params": {"1_keybind": "q", "2_rebind": "e"}}, "ID": "6b5d2db9-11f3-4c31-8a65-367be7647ff9", "TIME": "20240104114504117
-;---"}
+;---{"data": [], "ID": "a613d992-9ddf-4a90-ac7b-29a14bf34358", "options": {"1_keybind": "q", "2_rebind": "e", "3_test": ""}, "TIME": "
+;---20241109064333541"}
 */
